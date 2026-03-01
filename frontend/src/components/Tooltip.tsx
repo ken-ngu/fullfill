@@ -77,21 +77,28 @@ export function Tooltip({ content, children, variant = "icon" }: Props) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isVisible]);
 
-  const handleToggle = () => {
+  const handleToggle = (e: React.MouseEvent | React.TouchEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     setIsVisible(!isVisible);
   };
 
   const handleMouseEnter = () => {
+    // Only enable hover on non-touch devices
+    if (!window.matchMedia('(hover: hover)').matches) return;
     setIsVisible(true);
   };
 
   const handleMouseLeave = () => {
+    // Only enable hover on non-touch devices
+    if (!window.matchMedia('(hover: hover)').matches) return;
     setIsVisible(false);
   };
 
   // Position-specific styles
   const getTooltipPositionStyles = (): string => {
-    const baseStyles = "absolute w-80 z-50";
+    // Responsive width: smaller on mobile, normal on desktop
+    const baseStyles = "absolute w-[calc(100vw-2rem)] max-w-[320px] sm:w-80 z-50";
 
     switch (position) {
       case "bottom":
@@ -128,12 +135,17 @@ export function Tooltip({ content, children, variant = "icon" }: Props) {
     return (
       <div
         ref={triggerRef}
-        className="relative inline-flex cursor-help"
+        className="relative inline-flex cursor-help touch-none"
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
         onClick={handleToggle}
+        onTouchStart={(e) => {
+          // On touch devices, prevent hover and just toggle
+          e.preventDefault();
+          handleToggle(e);
+        }}
       >
-        <div className="border-b border-dotted border-slate-400 hover:border-slate-600 transition-colors">
+        <div className="border-b border-dotted border-slate-400 hover:border-slate-600 active:border-blue-500 transition-colors">
           {children}
         </div>
         {isVisible && (
@@ -158,12 +170,17 @@ export function Tooltip({ content, children, variant = "icon" }: Props) {
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
         onClick={handleToggle}
+        onTouchStart={(e) => {
+          // On touch devices, prevent hover and just toggle
+          e.stopPropagation();
+          handleToggle(e);
+        }}
         onFocus={handleMouseEnter}
         onBlur={handleMouseLeave}
-        className="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-slate-300/60 hover:bg-slate-400/80 text-slate-600 hover:text-slate-800 text-[9px] font-medium transition-all duration-150 cursor-help ml-1"
+        className="inline-flex items-center justify-center min-w-[44px] min-h-[44px] sm:w-3.5 sm:h-3.5 rounded-full bg-slate-300/60 hover:bg-slate-400/80 active:bg-slate-500 text-slate-600 hover:text-slate-800 text-[9px] font-medium transition-all duration-150 cursor-help ml-1 -my-5 sm:my-0"
         aria-label="More information"
       >
-        i
+        <span className="text-xs sm:text-[9px]">i</span>
       </button>
       {isVisible && (
         <div ref={tooltipRef} className={getTooltipPositionStyles()}>
