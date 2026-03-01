@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 import type { MedicationSummary, MedicationDetail, PatientContext } from "../types";
 import { getMedication, logEvent } from "../api/client";
@@ -43,6 +43,11 @@ export function Search({ specialty, setting, onSpecialtyChange, onNavigate }: Se
   });
   const ctxRef = useRef(ctx);
   ctxRef.current = ctx;
+
+  // Ensure page starts at top on mobile
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const loadMedication = useCallback(async (id: string, currentCtx: PatientContext) => {
     setLoading(true);

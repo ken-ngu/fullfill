@@ -26,7 +26,8 @@ export default function App() {
 
   function handleNavigate(page: string) {
     setCurrentPage(page as Page);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    // Instant scroll to top to prevent white screen on mobile
+    window.scrollTo(0, 0);
   }
 
   function handleContinue() {
