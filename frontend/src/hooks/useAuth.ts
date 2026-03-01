@@ -18,7 +18,7 @@ export function useAuthState(): AuthContextValue {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const login = useCallback(async (clinicCode: string, pin: string) => {
+  const login = useCallback(async (clinicCode: string, _pin: string) => {
     setLoading(true);
     setError(null);
     try {
