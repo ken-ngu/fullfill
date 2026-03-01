@@ -31,6 +31,9 @@ services:
     build:
       context: ./backend
     container_name: fullfill_backend
+    volumes:
+      - ./backend/src:/app/src
+      - ./backend/alembic:/app/alembic
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER:-fullfill}:${POSTGRES_PASSWORD:-fullfill}@db:5432/${POSTGRES_DB:-fullfill}
       REDIS_URL: redis://redis:6379/0
@@ -55,6 +58,10 @@ services:
     build:
       context: ./frontend
     container_name: fullfill_frontend
+    volumes:
+      - ./frontend/src:/app/src
+      - ./frontend/index.html:/app/index.html
+      - /app/node_modules
     environment:
       VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:8000}
     ports:

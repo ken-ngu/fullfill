@@ -1,7 +1,18 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useContext, createContext } from "react";
 import { login as apiLogin } from "../api/client";
 
-export function useAuth() {
+interface AuthContextValue {
+  token: string | null;
+  isAuthenticated: boolean;
+  loading: boolean;
+  error: string | null;
+  login: (clinicCode: string, pin: string) => Promise<void>;
+  logout: () => void;
+}
+
+export const AuthContext = createContext<AuthContextValue | null>(null);
+
+export function useAuthState(): AuthContextValue {
   const [token, setToken] = useState<string | null>(
     () => localStorage.getItem("fullfill_token")
   );
@@ -28,4 +39,10 @@ export function useAuth() {
   }, []);
 
   return { token, isAuthenticated: !!token, login, logout, error, loading };
+}
+
+export function useAuth(): AuthContextValue {
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error("useAuth must be used within AuthContext.Provider");
+  return ctx;
 }
