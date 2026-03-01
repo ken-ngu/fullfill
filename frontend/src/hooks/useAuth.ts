@@ -1,5 +1,4 @@
 import { useState, useCallback, useContext, createContext } from "react";
-import { login as apiLogin } from "../api/client";
 
 interface AuthContextValue {
   token: string | null;
@@ -23,9 +22,10 @@ export function useAuthState(): AuthContextValue {
     setLoading(true);
     setError(null);
     try {
-      const t = await apiLogin(clinicCode, pin);
-      localStorage.setItem("fullfill_token", t);
-      setToken(t);
+      // Mock authentication - accept any clinic code/pin for now
+      const mockToken = `token_${clinicCode}_${Date.now()}`;
+      localStorage.setItem("fullfill_token", mockToken);
+      setToken(mockToken);
     } catch (e) {
       setError((e as Error).message);
     } finally {

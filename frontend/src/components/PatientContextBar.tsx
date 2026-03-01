@@ -166,26 +166,6 @@ const AGE_TOOLTIP = (
   </div>
 );
 
-const TIER_INFO_TOOLTIP = (
-  <div className="space-y-2">
-    <p className="font-semibold text-sky-300">Formulary Tier Impact</p>
-    <p className="text-xs leading-relaxed">
-      <strong>Up to $1,072 difference between tiers</strong>
-    </p>
-    <div className="space-y-1 text-xs">
-      <p>Commercial insurance (deductible met):</p>
-      <ul className="list-disc pl-4 space-y-0.5">
-        <li><strong>Tier 1:</strong> $10-15 copay (preferred generics)</li>
-        <li><strong>Tier 2:</strong> $25-40 copay (generics)</li>
-        <li><strong>Tier 3:</strong> $50-80 copay (preferred brands)</li>
-        <li><strong>Tier 4:</strong> $100-200 copay (non-preferred brands)</li>
-        <li><strong>Tier 5:</strong> 20-33% coinsurance ($700-$1,485 for $4,000 drug)</li>
-      </ul>
-      <p className="text-emerald-300 font-medium mt-2">✓ Automatically determined by medication</p>
-    </div>
-  </div>
-);
-
 export function PatientContextBar({ ctx, onChange }: Props) {
   const handleInsuranceChange = (newInsuranceType: InsuranceType) => {
     // Reset conditional fields when insurance type changes

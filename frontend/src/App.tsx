@@ -45,7 +45,7 @@ export default function App() {
     setCurrentPage("search");
   }
 
-  function handleAuth(email: string) {
+  function handleAuth(_email: string) {
     handleNavigate("search");
   }
 

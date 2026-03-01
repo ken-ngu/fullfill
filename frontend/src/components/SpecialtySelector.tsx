@@ -14,7 +14,7 @@ const SPECIALTIES = [
   { id: "endocrinology", name: "Endocrinology", icon: "💉", setting: "outpatient" },
 ];
 
-export function SpecialtySelector({ onSelect, currentSpecialty, currentSetting }: Props) {
+export function SpecialtySelector({ onSelect, currentSpecialty, currentSetting: _currentSetting }: Props) {
   const [isOpen, setIsOpen] = useState(false);
 
   const current = SPECIALTIES.find(s => s.id === currentSpecialty) || SPECIALTIES[0];
