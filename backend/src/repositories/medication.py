@@ -1,0 +1,56 @@
+from __future__ import annotations
+
+"""
+Repository pattern for medication data access.
+
+Swap InMemory → Postgres by changing the dependency in dependencies.py.
+All services depend on this interface — zero changes needed at migration time.
+"""
+
+from abc import ABC, abstractmethod
+from sqlalchemy.orm import Session
+from src.models.medication import Medication
+
+
+class AbstractMedicationRepository(ABC):
+    @abstractmethod
+    def search(self, q: str, specialty: str | None = None, limit: int = 10) -> list[dict]:
+        pass
+
+    @abstractmethod
+    def get_by_id(self, medication_id: str) -> dict | None:
+        pass
+
+    @abstractmethod
+    def get_all(self, specialty: str | None = None) -> list[dict]:
+        pass
+
+
+def _to_dict(med: Medication) -> dict:
+    return {c.name: getattr(med, c.name) for c in med.__table__.columns}
+
+
+class PostgresMedicationRepository(AbstractMedicationRepository):
+    def __init__(self, session: Session):
+        self._session = session
+
+    def search(self, q: str, specialty: str | None = None, limit: int = 10) -> list[dict]:
+        q_lower = f"%{q.lower()}%"
+        query = self._session.query(Medication).filter(
+            Medication.name.ilike(q_lower)
+            | Medication.generic_name.ilike(q_lower)
+        )
+        if specialty:
+            query = query.filter(Medication.specialty == specialty)
+        results = query.limit(limit).all()
+        return [_to_dict(m) for m in results]
+
+    def get_by_id(self, medication_id: str) -> dict | None:
+        med = self._session.query(Medication).filter(Medication.id == medication_id).first()
+        return _to_dict(med) if med else None
+
+    def get_all(self, specialty: str | None = None) -> list[dict]:
+        query = self._session.query(Medication)
+        if specialty:
+            query = query.filter(Medication.specialty == specialty)
+        return [_to_dict(m) for m in query.all()]
