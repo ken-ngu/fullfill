@@ -27,6 +27,12 @@ export async function login(clinicCode: string, pin: string): Promise<string> {
   return data.access_token;
 }
 
+export async function getTopMedications(specialty?: string): Promise<MedicationSummary[]> {
+  const params = new URLSearchParams({ limit: "6" });
+  if (specialty) params.set("specialty", specialty);
+  return apiFetch<MedicationSummary[]>(`/api/v1/medications/top?${params}`);
+}
+
 export async function searchMedications(
   q: string,
   specialty?: string,

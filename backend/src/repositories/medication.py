@@ -25,6 +25,10 @@ class AbstractMedicationRepository(ABC):
     def get_all(self, specialty: str | None = None) -> list[dict]:
         pass
 
+    @abstractmethod
+    def get_top(self, specialty: str | None = None, limit: int = 6) -> list[dict]:
+        pass
+
 
 def _to_dict(med: Medication) -> dict:
     return {c.name: getattr(med, c.name) for c in med.__table__.columns}
@@ -54,3 +58,14 @@ class PostgresMedicationRepository(AbstractMedicationRepository):
         if specialty:
             query = query.filter(Medication.specialty == specialty)
         return [_to_dict(m) for m in query.all()]
+
+    def get_top(self, specialty: str | None = None, limit: int = 6) -> list[dict]:
+        query = self._session.query(Medication)
+        if specialty:
+            query = query.filter(Medication.specialty == specialty)
+        results = (
+            query.order_by(Medication.formulary_tier.asc(), Medication.name.asc())
+            .limit(limit)
+            .all()
+        )
+        return [_to_dict(m) for m in results]

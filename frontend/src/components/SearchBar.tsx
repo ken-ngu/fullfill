@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
 import type { MedicationSummary } from "../types";
-import { searchMedications } from "../api/client";
+import { searchMedications, getTopMedications } from "../api/client";
 
 interface Props {
   onSelect: (med: MedicationSummary) => void;
@@ -10,11 +10,18 @@ interface Props {
 export function SearchBar({ onSelect }: Props) {
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState<MedicationSummary[]>([]);
+  const [topMeds, setTopMeds] = useState<MedicationSummary[]>([]);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [focused, setFocused] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [dropdownPos, setDropdownPos] = useState({ top: 0, left: 0, width: 0 });
+
+  // Fetch top medications once on mount
+  useEffect(() => {
+    getTopMedications().then(setTopMeds).catch(() => {});
+  }, []);
 
   const updateDropdownPos = useCallback(() => {
     if (!inputRef.current) return;
@@ -30,7 +37,6 @@ export function SearchBar({ onSelect }: Props) {
   useEffect(() => {
     if (query.length < 2) {
       setSuggestions([]);
-      setOpen(false);
       return;
     }
     setLoading(true);
@@ -38,8 +44,6 @@ export function SearchBar({ onSelect }: Props) {
       try {
         const results = await searchMedications(query);
         setSuggestions(results);
-        setOpen(results.length > 0);
-        updateDropdownPos();
       } catch {
         setSuggestions([]);
       } finally {
@@ -47,21 +51,34 @@ export function SearchBar({ onSelect }: Props) {
       }
     }, 150);
     return () => clearTimeout(timer);
-  }, [query, updateDropdownPos]);
+  }, [query]);
+
+  // Decide what to show and whether dropdown is open
+  const visibleItems = query.length >= 2 ? suggestions : topMeds;
+  useEffect(() => {
+    if (focused && visibleItems.length > 0) {
+      updateDropdownPos();
+      setOpen(true);
+    } else {
+      setOpen(false);
+    }
+  }, [focused, visibleItems, updateDropdownPos]);
 
   function handleSelect(med: MedicationSummary) {
     setQuery(med.name);
     setOpen(false);
     setSuggestions([]);
+    setFocused(false);
     onSelect(med);
   }
 
   function handleClear() {
     setQuery("");
     setSuggestions([]);
-    setOpen(false);
     inputRef.current?.focus();
   }
+
+  const showingTop = query.length < 2;
 
   return (
     <div className="relative">
@@ -72,7 +89,8 @@ export function SearchBar({ onSelect }: Props) {
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          onFocus={updateDropdownPos}
+          onFocus={() => { setFocused(true); updateDropdownPos(); }}
+          onBlur={() => setTimeout(() => setFocused(false), 150)}
           placeholder="Search medication…"
           className="flex-1 px-3 py-3.5 text-sm text-slate-900 placeholder-slate-400 outline-none bg-transparent"
           autoComplete="off"
@@ -91,7 +109,7 @@ export function SearchBar({ onSelect }: Props) {
         )}
       </div>
 
-      {open && suggestions.length > 0 && createPortal(
+      {open && visibleItems.length > 0 && createPortal(
         <div
           ref={dropdownRef}
           style={{
@@ -103,10 +121,15 @@ export function SearchBar({ onSelect }: Props) {
           }}
           className="bg-white border border-slate-200 rounded-2xl shadow-lg overflow-hidden"
         >
-          {suggestions.map((med) => (
+          {showingTop && (
+            <p className="px-4 pt-3 pb-1 text-xs font-medium text-slate-400 uppercase tracking-wide">
+              Common medications
+            </p>
+          )}
+          {visibleItems.map((med) => (
             <button
               key={med.id}
-              onClick={() => handleSelect(med)}
+              onMouseDown={() => handleSelect(med)}
               className="w-full text-left px-4 py-3 hover:bg-slate-50 active:bg-slate-100 border-b border-slate-100 last:border-0 transition-colors min-h-[44px]"
             >
               <p className="text-sm font-medium text-slate-900">{med.name}</p>

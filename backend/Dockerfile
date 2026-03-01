@@ -25,4 +25,4 @@ COPY alembic.ini ./alembic.ini
 RUN useradd -m appuser
 USER appuser
 
-CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]

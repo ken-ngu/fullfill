@@ -40,6 +40,31 @@ def _pa_status(med: dict) -> PAStatus:
     )
 
 
+@router.get("/top", response_model=list[MedicationSummary])
+def top_medications(
+    specialty: str | None = Query(None),
+    limit: int = Query(6, ge=1, le=20),
+    repo: AbstractMedicationRepository = Depends(get_medication_repo),
+    _clinic: str = Depends(get_current_clinic),
+) -> list[MedicationSummary]:
+    results = repo.get_top(specialty=specialty, limit=limit)
+    return [
+        MedicationSummary(
+            id=m["id"],
+            name=m["name"],
+            generic_name=m["generic_name"],
+            specialty=m["specialty"],
+            category=m["category"],
+            dosage_form=m["dosage_form"],
+            strength=m["strength"],
+            formulary_tier=m["formulary_tier"],
+            requires_pa=m["requires_pa"],
+            is_otc=m.get("is_otc", False),
+        )
+        for m in results
+    ]
+
+
 @router.get("/search", response_model=list[MedicationSummary])
 def search_medications(
     q: str = Query(..., min_length=2, max_length=100),
