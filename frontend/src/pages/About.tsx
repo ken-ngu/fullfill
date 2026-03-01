@@ -8,7 +8,7 @@ export function About({ onNavigate }: Props) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
       <Navbar variant="landing" onNavigate={onNavigate} />
-      <div className="pt-24 pb-16 px-4">
+      <div className="pt-28 sm:pt-24 pb-16 px-4">
         <div className="max-w-3xl mx-auto">
           {/* Header */}
           <div className="text-center mb-12">

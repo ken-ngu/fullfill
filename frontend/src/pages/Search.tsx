@@ -98,7 +98,7 @@ export function Search({ specialty, setting, onSpecialtyChange, onNavigate, user
   return (
     <div className="min-h-screen bg-slate-50">
       <Navbar variant="app" onNavigate={onNavigate} />
-      <div className="max-w-7xl mx-auto px-4 pt-24 sm:pt-20 pb-24">
+      <div className="max-w-7xl mx-auto px-4 pt-28 sm:pt-20 pb-24">
         {/* Header - Single column for search and controls */}
         <div className="max-w-lg mx-auto">
           <div className="flex items-center justify-between mb-5">
