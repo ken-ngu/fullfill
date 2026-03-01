@@ -98,7 +98,7 @@ export function Search({ specialty, setting, onSpecialtyChange, onNavigate, user
         {/* Header */}
         <div className="flex items-center justify-between mb-5">
           <div>
-            <h1 className="text-lg font-semibold text-slate-900">
+            <h1 className="text-lg font-semibold text-sky-600">
               {user ? `Welcome, ${user.name}` : "FullFill"}
             </h1>
             <p className="text-xs text-slate-500">Transparent prescription decisions</p>

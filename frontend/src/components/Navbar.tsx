@@ -15,14 +15,20 @@ export function Navbar({ variant = "landing", onNavigate }: NavbarProps) {
     setMobileMenuOpen(false);
   };
 
+  const handleLogoClick = () => {
+    localStorage.removeItem("fullfill_visited");
+    handleNavClick("home");
+    window.location.reload();
+  };
+
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-200/60">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-12">
-          {/* Logo */}
+          {/* Logo - Always goes to landing */}
           <button
-            onClick={() => handleNavClick("home")}
-            className="text-lg font-semibold text-slate-900 hover:text-blue-600 transition-colors"
+            onClick={handleLogoClick}
+            className="text-lg font-semibold text-sky-600 hover:text-sky-700 transition-colors"
           >
             FullFill
           </button>

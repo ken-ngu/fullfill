@@ -37,7 +37,7 @@ export function Landing({ onContinue, onNavigate }: Props) {
       >
         {/* Logo/Brand */}
         <div className="mb-8">
-          <h1 className="text-6xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-4">
+          <h1 className="text-6xl font-bold bg-gradient-to-r from-sky-600 to-sky-700 bg-clip-text text-transparent mb-4">
             FullFill
           </h1>
           <p className="text-xl text-slate-600 font-medium">

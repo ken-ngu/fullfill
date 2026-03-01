@@ -12,8 +12,8 @@ export function About({ onNavigate }: Props) {
         <div className="max-w-3xl mx-auto">
           {/* Header */}
           <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold text-slate-900 mb-4">
-              About FullFill
+            <h1 className="text-4xl font-bold mb-4">
+              About <span className="text-sky-600">FullFill</span>
             </h1>
             <p className="text-lg text-slate-600">
               Empowering clinicians with transparent prescription cost information
@@ -89,6 +89,30 @@ export function About({ onNavigate }: Props) {
                 </p>
               </div>
             </div>
+          </div>
+
+          {/* Meet the Founder */}
+          <div className="bg-white rounded-2xl shadow-card border border-slate-200 p-8 mb-8">
+            <h2 className="text-2xl font-semibold text-slate-900 mb-4">Meet the Founder</h2>
+            <p className="text-slate-700 leading-relaxed mb-4">
+              FullFill was created by <strong>Kenny Nguyen</strong>, a physician who experienced
+              firsthand the frustration of prescribing medications without knowing whether patients
+              could afford them. After countless pharmacy callbacks about prior authorizations and
+              watching patients struggle with unexpected costs at the counter, Kenny realized that
+              clinicians needed better tools to make informed prescribing decisions.
+            </p>
+            <p className="text-slate-700 leading-relaxed mb-4">
+              The idea for FullFill came from a simple belief: healthcare providers shouldn't have
+              to choose between what's clinically best and what's financially accessible. With a
+              background in medicine and technology, Kenny built FullFill to bridge this gap—giving
+              clinicians the cost and formulary data they need, right at the point of prescribing.
+            </p>
+            <p className="text-slate-700 leading-relaxed">
+              FullFill is a mission-driven project focused on reducing prescription abandonment and
+              improving medication adherence through transparency. Every feature is designed with
+              one goal: help clinicians prescribe smarter, so patients can follow through on their
+              treatment plans.
+            </p>
           </div>
 
           {/* Call to Action */}
