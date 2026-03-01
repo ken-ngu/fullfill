@@ -29,7 +29,7 @@ export function Landing({ onContinue, onNavigate }: Props) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
       <Navbar variant="landing" onNavigate={onNavigate} />
-      <div className="min-h-screen flex items-center justify-center px-4">
+      <div className="min-h-screen flex items-center justify-center px-4 pt-16 pb-8">
       <div
         className={`max-w-2xl text-center transition-all duration-1000 ${
           animate ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
