@@ -23,6 +23,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY backend/src/ ./src/
 COPY backend/alembic/ ./alembic/
 COPY backend/alembic.ini ./alembic.ini
+COPY backend/seed_database.py ./seed_database.py
 
 RUN useradd -m appuser
 USER appuser
