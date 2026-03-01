@@ -39,16 +39,6 @@ def create_app() -> FastAPI:
     def health() -> dict:
         return {"status": "ok"}
 
-    @app.post("/admin/seed")
-    def seed_database() -> dict:
-        """One-time endpoint to seed the database. Remove after use."""
-        from src.data.seed import seed_db
-        try:
-            seed_db()
-            return {"status": "success", "message": "Database seeded with 39 medications"}
-        except Exception as e:
-            return {"status": "error", "message": str(e)}
-
     return app
 
 
