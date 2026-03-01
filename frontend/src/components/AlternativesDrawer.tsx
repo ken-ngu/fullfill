@@ -21,15 +21,16 @@ export function AlternativesDrawer({ alternatives, onSwitch }: Props) {
   if (alternatives.length === 0) return null;
 
   return (
-    <details className="group">
-      <summary className="cursor-pointer select-none list-none flex items-center justify-between py-3 px-1 text-sm font-medium text-slate-600">
-        <span>
-          {alternatives.length} lower-cost alternative{alternatives.length !== 1 ? "s" : ""}
+    <details className="group" open>
+      <summary className="cursor-pointer select-none list-none flex items-center justify-between py-3 px-4 bg-green-50 border border-green-200 rounded-xl text-sm font-semibold text-green-700 hover:bg-green-100 transition-colors">
+        <span className="flex items-center gap-2">
+          <span className="text-base">💰</span>
+          {alternatives.length} Lower-Cost Option{alternatives.length !== 1 ? "s" : ""} Available
         </span>
-        <span className="text-xs text-slate-400 group-open:rotate-180 transition-transform inline-block">▼</span>
+        <span className="text-xs text-green-600 group-open:rotate-180 transition-transform inline-block">▼</span>
       </summary>
 
-      <div className="space-y-2 pb-2">
+      <div className="space-y-2 pt-3 pb-1">
         {alternatives.map((alt) => (
           <div
             key={alt.id}
