@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
+import { Navbar } from "../components/Navbar";
 
 interface Props {
   onContinue: () => void;
+  onNavigate: (page: string) => void;
 }
 
-export function Landing({ onContinue }: Props) {
+export function Landing({ onContinue, onNavigate }: Props) {
   const [animate, setAnimate] = useState(false);
 
   useEffect(() => {
@@ -25,7 +27,9 @@ export function Landing({ onContinue }: Props) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+      <Navbar variant="landing" onNavigate={onNavigate} />
+      <div className="min-h-screen flex items-center justify-center px-4">
       <div
         className={`max-w-2xl text-center transition-all duration-1000 ${
           animate ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
@@ -105,6 +109,7 @@ export function Landing({ onContinue }: Props) {
           Estimates are not a guarantee of actual patient cost.
           Not a substitute for clinical judgment.
         </p>
+      </div>
       </div>
     </div>
   );

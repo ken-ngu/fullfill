@@ -10,6 +10,7 @@ import { AlternativesDrawer } from "../components/AlternativesDrawer";
 import { LoadingSkeleton } from "../components/LoadingSkeleton";
 import { PatientContextBar } from "../components/PatientContextBar";
 import { SpecialtySelector } from "../components/SpecialtySelector";
+import { Navbar } from "../components/Navbar";
 
 const SESSION_ID = uuidv4();
 
@@ -24,9 +25,11 @@ interface SearchProps {
   specialty: string;
   setting: string;
   onSpecialtyChange: (specialty: string, setting: string) => void;
+  onNavigate: (page: string) => void;
+  user: { email: string; name: string } | null;
 }
 
-export function Search({ specialty, setting, onSpecialtyChange }: SearchProps) {
+export function Search({ specialty, setting, onSpecialtyChange, onNavigate, user }: SearchProps) {
   const [detail, setDetail] = useState<MedicationDetail | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -90,11 +93,14 @@ export function Search({ specialty, setting, onSpecialtyChange }: SearchProps) {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <div className="max-w-lg mx-auto px-4 pt-6 pb-24">
+      <Navbar variant="app" onNavigate={onNavigate} />
+      <div className="max-w-lg mx-auto px-4 pt-20 pb-24">
         {/* Header */}
         <div className="flex items-center justify-between mb-5">
           <div>
-            <h1 className="text-lg font-semibold text-slate-900">FullFill</h1>
+            <h1 className="text-lg font-semibold text-slate-900">
+              {user ? `Welcome, ${user.name}` : "FullFill"}
+            </h1>
             <p className="text-xs text-slate-500">Transparent prescription decisions</p>
           </div>
           <SpecialtySelector
