@@ -100,11 +100,6 @@ export function Search({ specialty, setting, onSpecialtyChange, onNavigate }: Se
       <div className="max-w-7xl mx-auto px-4 pt-24 pb-24">
         {/* Search and controls - Apple-inspired minimal layout */}
         <div className="max-w-2xl mx-auto">
-          {/* Search bar first - hero element */}
-          <div className="mb-6">
-            <SearchBar onSelect={handleSearchSelect} specialty={specialty} setting={setting} />
-          </div>
-
           {/* Specialty selector with label on left */}
           <div className="mb-6">
             <label className="block text-xs font-medium text-slate-500 mb-2">
@@ -117,9 +112,14 @@ export function Search({ specialty, setting, onSpecialtyChange, onNavigate }: Se
             />
           </div>
 
-          {/* Patient context - below specialty */}
-          <div className="mb-8">
+          {/* Patient context */}
+          <div className="mb-6">
             <PatientContextBar ctx={ctx} onChange={handleCtxChange} />
+          </div>
+
+          {/* Search bar - below patient context */}
+          <div className="mb-8">
+            <SearchBar onSelect={handleSearchSelect} specialty={specialty} setting={setting} />
           </div>
         </div>
 
