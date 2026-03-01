@@ -43,6 +43,8 @@ class MedicationSummary(BaseModel):
     formulary_tier: int
     requires_pa: bool
     is_otc: bool
+    setting: str = "outpatient"
+    discharge_only: bool = False
 
 
 class PatientContext(BaseModel):

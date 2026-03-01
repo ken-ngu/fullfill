@@ -22,6 +22,11 @@ class Medication(Base):
     therapeutic_class = Column(String, nullable=False)
     clinical_equivalence_group = Column(String, nullable=True)
 
+    # Care setting: outpatient | urgent_care | emergency | inpatient
+    setting = Column(String, nullable=False, server_default="outpatient")
+    # True for drugs dispensed only at discharge (ER/UC), not during the encounter
+    discharge_only = Column(Boolean, nullable=False, server_default="false")
+
     # Formulation
     dosage_form = Column(String, nullable=False)
     strength = Column(String, nullable=False)

@@ -22,7 +22,7 @@ export function CostCard({ estimate, confidenceScore }: Props) {
   const basisLabel = BASIS_LABELS[estimate.cost_basis] ?? "";
 
   return (
-    <div className="bg-slate-50 border border-slate-200 shadow-card rounded-2xl p-4">
+    <div className="bg-slate-50 border border-slate-200 shadow-card hover:shadow-card-hover rounded-2xl p-4 transition-all duration-200 hover:bg-white animate-fade-in">
       <p className="text-xs font-medium text-slate-500 mb-1">{estimate.label}</p>
       <p className="text-base font-semibold text-slate-900">
         {formatUsd(estimate.low_usd)}–{formatUsd(estimate.high_usd)}

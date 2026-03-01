@@ -2,15 +2,10 @@ import type { MedicationSummary, MedicationDetail, PatientContext } from "../typ
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
 
-function authHeaders(): Record<string, string> {
-  const token = localStorage.getItem("fullfill_token");
-  return token ? { Authorization: `Bearer ${token}` } : {};
-}
-
 async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
   const res = await fetch(`${BASE_URL}${path}`, {
     ...options,
-    headers: { "Content-Type": "application/json", ...authHeaders(), ...options?.headers },
+    headers: { "Content-Type": "application/json", ...options?.headers },
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({ detail: res.statusText }));
@@ -19,27 +14,22 @@ async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
   return res.json();
 }
 
-export async function login(clinicCode: string, pin: string): Promise<string> {
-  const data = await apiFetch<{ access_token: string }>("/api/v1/auth/token", {
-    method: "POST",
-    body: JSON.stringify({ clinic_code: clinicCode, pin }),
-  });
-  return data.access_token;
-}
-
-export async function getTopMedications(specialty?: string): Promise<MedicationSummary[]> {
+export async function getTopMedications(specialty?: string, setting?: string): Promise<MedicationSummary[]> {
   const params = new URLSearchParams({ limit: "6" });
   if (specialty) params.set("specialty", specialty);
+  if (setting) params.set("setting", setting);
   return apiFetch<MedicationSummary[]>(`/api/v1/medications/top?${params}`);
 }
 
 export async function searchMedications(
   q: string,
   specialty?: string,
+  setting?: string,
   limit = 10
 ): Promise<MedicationSummary[]> {
   const params = new URLSearchParams({ q, limit: String(limit) });
   if (specialty) params.set("specialty", specialty);
+  if (setting) params.set("setting", setting);
   return apiFetch<MedicationSummary[]>(`/api/v1/medications/search?${params}`);
 }
 

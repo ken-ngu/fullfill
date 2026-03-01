@@ -1,12 +1,5 @@
 from __future__ import annotations
 
-"""
-Repository pattern for medication data access.
-
-Swap InMemory → Postgres by changing the dependency in dependencies.py.
-All services depend on this interface — zero changes needed at migration time.
-"""
-
 from abc import ABC, abstractmethod
 from sqlalchemy.orm import Session
 from src.models.medication import Medication
@@ -14,7 +7,7 @@ from src.models.medication import Medication
 
 class AbstractMedicationRepository(ABC):
     @abstractmethod
-    def search(self, q: str, specialty: str | None = None, limit: int = 10) -> list[dict]:
+    def search(self, q: str, specialty: str | None = None, setting: str | None = None, limit: int = 10) -> list[dict]:
         pass
 
     @abstractmethod
@@ -26,7 +19,7 @@ class AbstractMedicationRepository(ABC):
         pass
 
     @abstractmethod
-    def get_top(self, specialty: str | None = None, limit: int = 6) -> list[dict]:
+    def get_top(self, specialty: str | None = None, setting: str | None = None, limit: int = 6) -> list[dict]:
         pass
 
 
@@ -38,7 +31,7 @@ class PostgresMedicationRepository(AbstractMedicationRepository):
     def __init__(self, session: Session):
         self._session = session
 
-    def search(self, q: str, specialty: str | None = None, limit: int = 10) -> list[dict]:
+    def search(self, q: str, specialty: str | None = None, setting: str | None = None, limit: int = 10) -> list[dict]:
         q_lower = f"%{q.lower()}%"
         query = self._session.query(Medication).filter(
             Medication.name.ilike(q_lower)
@@ -46,8 +39,9 @@ class PostgresMedicationRepository(AbstractMedicationRepository):
         )
         if specialty:
             query = query.filter(Medication.specialty == specialty)
-        results = query.limit(limit).all()
-        return [_to_dict(m) for m in results]
+        if setting:
+            query = query.filter(Medication.setting == setting)
+        return [_to_dict(m) for m in query.limit(limit).all()]
 
     def get_by_id(self, medication_id: str) -> dict | None:
         med = self._session.query(Medication).filter(Medication.id == medication_id).first()
@@ -59,10 +53,12 @@ class PostgresMedicationRepository(AbstractMedicationRepository):
             query = query.filter(Medication.specialty == specialty)
         return [_to_dict(m) for m in query.all()]
 
-    def get_top(self, specialty: str | None = None, limit: int = 6) -> list[dict]:
+    def get_top(self, specialty: str | None = None, setting: str | None = None, limit: int = 6) -> list[dict]:
         query = self._session.query(Medication)
         if specialty:
             query = query.filter(Medication.specialty == specialty)
+        if setting:
+            query = query.filter(Medication.setting == setting)
         results = (
             query.order_by(Medication.formulary_tier.asc(), Medication.name.asc())
             .limit(limit)

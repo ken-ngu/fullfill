@@ -63,9 +63,27 @@ export function Login() {
             </button>
           </form>
 
-          <p className="text-xs text-slate-400 mt-4 text-center">
-            Demo: code <strong>DEMO</strong> / pin <strong>demo123</strong>
-          </p>
+          <div className="mt-4 space-y-1">
+            <p className="text-xs text-slate-400 text-center font-medium">Demo accounts</p>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => { setCode("DEMO"); setPin("demo123"); }}
+                className="flex-1 text-xs text-slate-500 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl py-2 px-3 text-left transition-colors"
+              >
+                <span className="font-medium text-slate-700">DEMO</span>
+                <span className="block text-slate-400">Dermatology</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => { setCode("ER001"); setPin("er123"); }}
+                className="flex-1 text-xs text-slate-500 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl py-2 px-3 text-left transition-colors"
+              >
+                <span className="font-medium text-slate-700">ER001</span>
+                <span className="block text-slate-400">Emergency care</span>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>

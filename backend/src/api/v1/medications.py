@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends, HTTPException, Query
-from src.dependencies import get_medication_repo, get_current_clinic
+from src.dependencies import get_medication_repo
 from src.repositories.medication import AbstractMedicationRepository
 from src.services.fill_risk import calculate_fill_risk
 from src.services.alternatives import find_alternatives, build_switch_note
@@ -40,55 +40,48 @@ def _pa_status(med: dict) -> PAStatus:
     )
 
 
+def _resolve_specialty(explicit: str | None, default: str = "dermatology") -> str:
+    return explicit if explicit is not None else default
+
+
+def _to_summary(m: dict) -> MedicationSummary:
+    return MedicationSummary(
+        id=m["id"],
+        name=m["name"],
+        generic_name=m["generic_name"],
+        specialty=m["specialty"],
+        category=m["category"],
+        dosage_form=m["dosage_form"],
+        strength=m["strength"],
+        formulary_tier=m["formulary_tier"],
+        requires_pa=m["requires_pa"],
+        is_otc=m.get("is_otc", False),
+        setting=m.get("setting", "outpatient"),
+        discharge_only=m.get("discharge_only", False),
+    )
+
+
 @router.get("/top", response_model=list[MedicationSummary])
 def top_medications(
     specialty: str | None = Query(None),
+    setting: str | None = Query(None),
     limit: int = Query(6, ge=1, le=20),
     repo: AbstractMedicationRepository = Depends(get_medication_repo),
-    _clinic: str = Depends(get_current_clinic),
 ) -> list[MedicationSummary]:
-    results = repo.get_top(specialty=specialty, limit=limit)
-    return [
-        MedicationSummary(
-            id=m["id"],
-            name=m["name"],
-            generic_name=m["generic_name"],
-            specialty=m["specialty"],
-            category=m["category"],
-            dosage_form=m["dosage_form"],
-            strength=m["strength"],
-            formulary_tier=m["formulary_tier"],
-            requires_pa=m["requires_pa"],
-            is_otc=m.get("is_otc", False),
-        )
-        for m in results
-    ]
+    resolved = _resolve_specialty(specialty)
+    return [_to_summary(m) for m in repo.get_top(specialty=resolved, limit=limit, setting=setting)]
 
 
 @router.get("/search", response_model=list[MedicationSummary])
 def search_medications(
     q: str = Query(..., min_length=2, max_length=100),
     specialty: str | None = Query(None),
+    setting: str | None = Query(None),
     limit: int = Query(10, ge=1, le=50),
     repo: AbstractMedicationRepository = Depends(get_medication_repo),
-    _clinic: str = Depends(get_current_clinic),
 ) -> list[MedicationSummary]:
-    results = repo.search(q=q, specialty=specialty, limit=limit)
-    return [
-        MedicationSummary(
-            id=m["id"],
-            name=m["name"],
-            generic_name=m["generic_name"],
-            specialty=m["specialty"],
-            category=m["category"],
-            dosage_form=m["dosage_form"],
-            strength=m["strength"],
-            formulary_tier=m["formulary_tier"],
-            requires_pa=m["requires_pa"],
-            is_otc=m.get("is_otc", False),
-        )
-        for m in results
-    ]
+    resolved = _resolve_specialty(specialty)
+    return [_to_summary(m) for m in repo.search(q=q, specialty=resolved, limit=limit, setting=setting)]
 
 
 @router.get("/{medication_id}", response_model=MedicationDetail)
@@ -97,10 +90,11 @@ def get_medication(
     insurance_type: str = Query("commercial"),
     age: int | None = Query(None, ge=0, le=120),
     deductible_met: bool = Query(False),
-    specialty: str = Query("dermatology"),
+    specialty: str | None = Query(None),
     repo: AbstractMedicationRepository = Depends(get_medication_repo),
-    _clinic: str = Depends(get_current_clinic),
 ) -> MedicationDetail:
+    resolved_specialty = _resolve_specialty(specialty)
+
     med = repo.get_by_id(medication_id)
     if med is None:
         raise HTTPException(status_code=404, detail="Medication not found")
@@ -108,7 +102,7 @@ def get_medication(
     all_meds = repo.get_all(specialty=med["specialty"])
     alt_meds = find_alternatives(med, all_meds)
 
-    fill_risk = calculate_fill_risk(med, specialty=specialty)
+    fill_risk = calculate_fill_risk(med, specialty=resolved_specialty)
     confidence = calculate_confidence(med)
 
     alternatives = [
@@ -117,7 +111,7 @@ def get_medication(
             name=a["name"],
             generic_name=a["generic_name"],
             cost_estimate=_cost_estimate(a),
-            fill_risk_level=calculate_fill_risk(a, specialty=specialty).level,
+            fill_risk_level=calculate_fill_risk(a, specialty=resolved_specialty).level,
             confidence_score=calculate_confidence(a),
             switch_note=build_switch_note(a, med),
         )
@@ -135,6 +129,8 @@ def get_medication(
         formulary_tier=med["formulary_tier"],
         requires_pa=med["requires_pa"],
         is_otc=med.get("is_otc", False),
+        setting=med.get("setting", "outpatient"),
+        discharge_only=med.get("discharge_only", False),
         brand_names=med.get("brand_names") or [],
         therapeutic_class=med["therapeutic_class"],
         brand_only=med["brand_only"],

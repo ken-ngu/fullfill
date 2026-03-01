@@ -35,6 +35,18 @@ FILL_RISK_WEIGHTS: dict[str, dict[str, float]] = {
         "high_tier": 1.0,
         "step_therapy": 1.5,
     },
+    "urgent_care": {
+        "requires_pa": 1.5,
+        "brand_only": 1.5,
+        "high_tier": 1.5,
+        "step_therapy": 2.0,
+    },
+    "emergency": {
+        "requires_pa": 0.5,
+        "brand_only": 2.5,
+        "high_tier": 2.0,
+        "step_therapy": 2.5,
+    },
 }
 
 _HIGH_TIER_THRESHOLD = 3

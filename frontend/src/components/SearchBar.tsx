@@ -5,23 +5,18 @@ import { searchMedications, getTopMedications } from "../api/client";
 
 interface Props {
   onSelect: (med: MedicationSummary) => void;
+  specialty?: string;
+  setting?: string;
 }
 
-export function SearchBar({ onSelect }: Props) {
+export function SearchBar({ onSelect, specialty, setting }: Props) {
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState<MedicationSummary[]>([]);
   const [topMeds, setTopMeds] = useState<MedicationSummary[]>([]);
-  const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [focused, setFocused] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-  const dropdownRef = useRef<HTMLDivElement>(null);
   const [dropdownPos, setDropdownPos] = useState({ top: 0, left: 0, width: 0 });
-
-  // Fetch top medications once on mount
-  useEffect(() => {
-    getTopMedications().then(setTopMeds).catch(() => {});
-  }, []);
 
   const updateDropdownPos = useCallback(() => {
     if (!inputRef.current) return;
@@ -33,6 +28,11 @@ export function SearchBar({ onSelect }: Props) {
     });
   }, []);
 
+  // Fetch top meds on mount and when specialty/setting changes
+  useEffect(() => {
+    getTopMedications(specialty, setting).then(setTopMeds).catch(() => {});
+  }, [specialty, setting]);
+
   // Debounced search — 150ms
   useEffect(() => {
     if (query.length < 2) {
@@ -42,7 +42,7 @@ export function SearchBar({ onSelect }: Props) {
     setLoading(true);
     const timer = setTimeout(async () => {
       try {
-        const results = await searchMedications(query);
+        const results = await searchMedications(query, specialty, setting);
         setSuggestions(results);
       } catch {
         setSuggestions([]);
@@ -51,24 +51,17 @@ export function SearchBar({ onSelect }: Props) {
       }
     }, 150);
     return () => clearTimeout(timer);
-  }, [query]);
+  }, [query, specialty]);
 
-  // Decide what to show and whether dropdown is open
   const visibleItems = query.length >= 2 ? suggestions : topMeds;
-  useEffect(() => {
-    if (focused && visibleItems.length > 0) {
-      updateDropdownPos();
-      setOpen(true);
-    } else {
-      setOpen(false);
-    }
-  }, [focused, visibleItems, updateDropdownPos]);
+  const showingTop = query.length < 2;
+  // Dropdown is open whenever the input is focused AND there's something to show
+  const open = focused && visibleItems.length > 0;
 
   function handleSelect(med: MedicationSummary) {
     setQuery(med.name);
-    setOpen(false);
-    setSuggestions([]);
     setFocused(false);
+    setSuggestions([]);
     onSelect(med);
   }
 
@@ -77,8 +70,6 @@ export function SearchBar({ onSelect }: Props) {
     setSuggestions([]);
     inputRef.current?.focus();
   }
-
-  const showingTop = query.length < 2;
 
   return (
     <div className="relative">
@@ -109,9 +100,8 @@ export function SearchBar({ onSelect }: Props) {
         )}
       </div>
 
-      {open && visibleItems.length > 0 && createPortal(
+      {open && createPortal(
         <div
-          ref={dropdownRef}
           style={{
             position: "absolute",
             top: dropdownPos.top,

@@ -21,7 +21,7 @@ const RISK_DOT: Record<RiskLevel, string> = {
 export function FillRiskBanner({ level, plainLanguage, reasons }: Props) {
   const s = RISK_STYLES[level];
   return (
-    <div className={`w-full rounded-2xl p-4 border ${s.bg} ${s.border}`}>
+    <div className={`w-full rounded-2xl p-4 border shadow-card hover:shadow-card-hover transition-shadow duration-200 ${s.bg} ${s.border} animate-fade-in`}>
       <div className="flex items-center gap-2 mb-1">
         <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${RISK_DOT[level]}`} />
         <p className={`text-sm font-semibold ${s.text}`}>{s.label}</p>

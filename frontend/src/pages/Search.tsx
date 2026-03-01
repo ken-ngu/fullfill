@@ -9,6 +9,7 @@ import { PAStatusCard } from "../components/PAStatusCard";
 import { AlternativesDrawer } from "../components/AlternativesDrawer";
 import { LoadingSkeleton } from "../components/LoadingSkeleton";
 import { PatientContextBar } from "../components/PatientContextBar";
+import { SpecialtySelector } from "../components/SpecialtySelector";
 
 const SESSION_ID = uuidv4();
 
@@ -19,7 +20,13 @@ function ageGroup(age: number | null): string | undefined {
   return "senior";
 }
 
-export function Search() {
+interface SearchProps {
+  specialty: string;
+  setting: string;
+  onSpecialtyChange: (specialty: string, setting: string) => void;
+}
+
+export function Search({ specialty, setting, onSpecialtyChange }: SearchProps) {
   const [detail, setDetail] = useState<MedicationDetail | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -85,9 +92,16 @@ export function Search() {
     <div className="min-h-screen bg-slate-50">
       <div className="max-w-lg mx-auto px-4 pt-6 pb-24">
         {/* Header */}
-        <div className="mb-5">
-          <h1 className="text-lg font-semibold text-slate-900">FirstFill</h1>
-          <p className="text-xs text-slate-500">Prescribing cost support · Dermatology</p>
+        <div className="flex items-center justify-between mb-5">
+          <div>
+            <h1 className="text-lg font-semibold text-slate-900">FullFill</h1>
+            <p className="text-xs text-slate-500">Transparent prescription decisions</p>
+          </div>
+          <SpecialtySelector
+            onSelect={onSpecialtyChange}
+            currentSpecialty={specialty}
+            currentSetting={setting}
+          />
         </div>
 
         {/* Patient context */}
@@ -97,7 +111,7 @@ export function Search() {
 
         {/* Search */}
         <div className="mb-4">
-          <SearchBar onSelect={handleSearchSelect} />
+          <SearchBar onSelect={handleSearchSelect} specialty={specialty} setting={setting} />
         </div>
 
         {/* Results */}
