@@ -28,10 +28,9 @@ interface SearchProps {
   setting: string;
   onSpecialtyChange: (specialty: string, setting: string) => void;
   onNavigate: (page: string) => void;
-  user: { email: string; name: string } | null;
 }
 
-export function Search({ specialty, setting, onSpecialtyChange, onNavigate, user }: SearchProps) {
+export function Search({ specialty, setting, onSpecialtyChange, onNavigate }: SearchProps) {
   const [detail, setDetail] = useState<MedicationDetail | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

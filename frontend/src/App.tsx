@@ -9,7 +9,6 @@ type Page = "home" | "about" | "data-sources" | "login" | "search";
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState<Page>("home");
-  const [user, setUser] = useState<{ email: string; name: string } | null>(null);
   const [specialty, setSpecialty] = useState<string>(() => {
     return localStorage.getItem("fullfill_specialty") || "dermatology";
   });
@@ -22,16 +21,6 @@ export default function App() {
     const hasVisited = localStorage.getItem("fullfill_visited");
     if (hasVisited === "true") {
       setCurrentPage("search");
-    }
-
-    // Check if user is logged in
-    const savedUser = localStorage.getItem("fullfill_user");
-    if (savedUser) {
-      try {
-        setUser(JSON.parse(savedUser));
-      } catch {
-        // Invalid user data
-      }
     }
   }, []);
 
@@ -78,7 +67,6 @@ export default function App() {
       setting={setting}
       onSpecialtyChange={handleSpecialtyChange}
       onNavigate={handleNavigate}
-      user={user}
     />
   );
 }
