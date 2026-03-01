@@ -23,6 +23,7 @@ export interface AlternativeSummary {
   id: string;
   name: string;
   generic_name: string;
+  brand_names?: string[];
   cost_estimate: CostEstimate;
   fill_risk_level: RiskLevel;
   confidence_score: number;
@@ -33,6 +34,7 @@ export interface MedicationSummary {
   id: string;
   name: string;
   generic_name: string;
+  brand_names?: string[];
   specialty: string;
   category: string;
   dosage_form: string;

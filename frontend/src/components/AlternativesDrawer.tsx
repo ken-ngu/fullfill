@@ -37,8 +37,17 @@ export function AlternativesDrawer({ alternatives, onSwitch }: Props) {
             className="bg-slate-50 border border-slate-200 rounded-2xl p-3 flex items-center justify-between gap-3"
           >
             <div className="min-w-0">
-              <p className="text-xs font-medium text-slate-900 truncate">{alt.name}</p>
-              <p className="text-xs text-slate-500">{alt.generic_name}</p>
+              {alt.brand_names && alt.brand_names.length > 0 ? (
+                <>
+                  <p className="text-xs font-medium text-slate-900 truncate">{alt.brand_names[0]}</p>
+                  <p className="text-xs text-slate-500">{alt.generic_name}</p>
+                </>
+              ) : (
+                <>
+                  <p className="text-xs font-medium text-slate-900 truncate">{alt.generic_name}</p>
+                  <p className="text-xs text-slate-500">{alt.name}</p>
+                </>
+              )}
               <div className="flex items-center gap-2 mt-1">
                 <span className="text-xs text-slate-700">
                   {formatUsd(alt.cost_estimate.low_usd)}–{formatUsd(alt.cost_estimate.high_usd)}

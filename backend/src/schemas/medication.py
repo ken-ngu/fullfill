@@ -26,6 +26,7 @@ class AlternativeSummary(BaseModel):
     id: str
     name: str
     generic_name: str
+    brand_names: list[str] = []
     cost_estimate: CostEstimate
     fill_risk_level: str
     confidence_score: int
@@ -36,6 +37,7 @@ class MedicationSummary(BaseModel):
     id: str
     name: str
     generic_name: str
+    brand_names: list[str] = []
     specialty: str
     category: str
     dosage_form: str

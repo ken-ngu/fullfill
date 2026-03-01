@@ -152,8 +152,27 @@ export function Search({ specialty, setting, onSpecialtyChange, onNavigate }: Se
                 <div className="space-y-3 transition-opacity duration-150">
                   {/* Medication name */}
                   <div>
-                    <p className="text-base font-semibold text-slate-900">{detail.name}</p>
-                    <p className="text-xs text-slate-500">{detail.generic_name} · {detail.dosage_form} · {detail.strength}</p>
+                    {detail.brand_names && detail.brand_names.length > 0 ? (
+                      <>
+                        <p className="text-base font-semibold text-slate-900">
+                          {detail.brand_names[0]}
+                          <span className="text-slate-500 font-normal ml-1.5">
+                            ({detail.generic_name})
+                          </span>
+                        </p>
+                        {detail.brand_names.length > 1 && (
+                          <p className="text-xs text-slate-400 mt-0.5">
+                            Also: {detail.brand_names.slice(1).join(", ")}
+                          </p>
+                        )}
+                        <p className="text-xs text-slate-500">{detail.dosage_form} · {detail.strength}</p>
+                      </>
+                    ) : (
+                      <>
+                        <p className="text-base font-semibold text-slate-900">{detail.generic_name}</p>
+                        <p className="text-xs text-slate-500">{detail.dosage_form} · {detail.strength}</p>
+                      </>
+                    )}
                   </div>
 
                   {/* 1. Fill risk (dominant) */}

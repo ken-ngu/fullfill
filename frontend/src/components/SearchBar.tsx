@@ -131,12 +131,28 @@ export function SearchBar({ onSelect, specialty, setting }: Props) {
               onMouseDown={() => handleSelect(med)}
               className="w-full text-left px-5 py-3.5 hover:bg-slate-50/80 active:bg-slate-100/80 border-b border-slate-100/50 last:border-0 transition-all min-h-[56px]"
             >
-              <p className="text-sm font-medium text-slate-900">{med.name}</p>
-              <p className="text-xs text-slate-500 mt-0.5 font-light">
-                {med.generic_name} · {med.dosage_form}
-                {med.is_otc && " · OTC"}
-                {med.requires_pa && " · PA required"}
-              </p>
+              {med.brand_names && med.brand_names.length > 0 ? (
+                <>
+                  <p className="text-sm font-medium text-slate-900">
+                    {med.brand_names[0]}{" "}
+                    <span className="text-slate-500 font-normal">({med.generic_name})</span>
+                  </p>
+                  <p className="text-xs text-slate-500 mt-0.5 font-light">
+                    {med.dosage_form}
+                    {med.is_otc && " · OTC"}
+                    {med.requires_pa && " · PA required"}
+                  </p>
+                </>
+              ) : (
+                <>
+                  <p className="text-sm font-medium text-slate-900">{med.name}</p>
+                  <p className="text-xs text-slate-500 mt-0.5 font-light">
+                    {med.generic_name} · {med.dosage_form}
+                    {med.is_otc && " · OTC"}
+                    {med.requires_pa && " · PA required"}
+                  </p>
+                </>
+              )}
             </button>
           ))}
         </div>,

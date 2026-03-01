@@ -71,8 +71,24 @@ export function AlternativesTable({ alternatives, primaryCostLow, primaryCostHig
                 <tr key={alt.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
                   <td className="py-3 pr-2">
                     <div className="min-w-0">
-                      <p className="font-medium text-slate-900 truncate text-xs">{alt.name}</p>
-                      <p className="text-slate-500 truncate text-xs mt-0.5">{alt.generic_name}</p>
+                      {alt.brand_names && alt.brand_names.length > 0 ? (
+                        <>
+                          <p className="font-medium text-slate-900 truncate text-xs">
+                            {alt.brand_names[0]}{" "}
+                            <span className="text-slate-500 font-normal">({alt.generic_name})</span>
+                          </p>
+                          {alt.brand_names.length > 1 && (
+                            <p className="text-slate-400 truncate text-xs mt-0.5">
+                              +{alt.brand_names.length - 1} more
+                            </p>
+                          )}
+                        </>
+                      ) : (
+                        <>
+                          <p className="font-medium text-slate-900 truncate text-xs">{alt.generic_name}</p>
+                          <p className="text-slate-500 truncate text-xs mt-0.5">{alt.name}</p>
+                        </>
+                      )}
                     </div>
                   </td>
                   <td className="py-3 px-2 whitespace-nowrap">

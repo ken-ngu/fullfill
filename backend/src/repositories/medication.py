@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from sqlalchemy import func, String
 from sqlalchemy.orm import Session
 from src.models.medication import Medication
 
@@ -33,9 +34,11 @@ class PostgresMedicationRepository(AbstractMedicationRepository):
 
     def search(self, q: str, specialty: str | None = None, setting: str | None = None, limit: int = 10) -> list[dict]:
         q_lower = f"%{q.lower()}%"
+        # Search by name, generic name, and brand names (JSON array)
         query = self._session.query(Medication).filter(
             Medication.name.ilike(q_lower)
             | Medication.generic_name.ilike(q_lower)
+            | func.lower(func.cast(Medication.brand_names, String)).ilike(q_lower)
         )
         if specialty:
             query = query.filter(Medication.specialty == specialty)
