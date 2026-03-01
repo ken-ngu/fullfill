@@ -95,17 +95,18 @@ export function About({ onNavigate }: Props) {
           <div className="bg-white rounded-2xl shadow-card border border-slate-200 p-8 mb-8">
             <h2 className="text-2xl font-semibold text-slate-900 mb-4">Meet the Founder</h2>
             <p className="text-slate-700 leading-relaxed mb-4">
-              FullFill was created by <strong>Kenny Nguyen</strong>, a physician who experienced
-              firsthand the frustration of prescribing medications without knowing whether patients
-              could afford them. After countless pharmacy callbacks about prior authorizations and
-              watching patients struggle with unexpected costs at the counter, Kenny realized that
-              clinicians needed better tools to make informed prescribing decisions.
+              FullFill was created by <strong>Kenny Nguyen</strong>, a patient who experienced
+              firsthand the frustration of not knowing medication costs until reaching the pharmacy
+              counter. Struggling with impatience and watching prescriptions sit unfilled due to
+              unexpected prices, Kenny realized that both patients and clinicians needed better
+              transparency tools before prescriptions are even written.
             </p>
             <p className="text-slate-700 leading-relaxed mb-4">
-              The idea for FullFill came from a simple belief: healthcare providers shouldn't have
-              to choose between what's clinically best and what's financially accessible. With a
-              background in medicine and technology, Kenny built FullFill to bridge this gap—giving
-              clinicians the cost and formulary data they need, right at the point of prescribing.
+              The idea for FullFill came from a simple belief: patients shouldn't have to choose
+              between their health and their budget, and clinicians shouldn't have to prescribe
+              blindly without cost information. With a background in technology and a patient's
+              perspective, Kenny built FullFill to bridge this gap—giving everyone the cost and
+              formulary data they need, right at the point of prescribing.
             </p>
             <p className="text-slate-700 leading-relaxed">
               FullFill is a mission-driven project focused on reducing prescription abandonment and
