@@ -1869,5 +1869,10 @@ def run_seed(database_url: str | None = None) -> None:
             print("All medications already seeded.")
 
 
+def seed_db() -> None:
+    """Alias for run_seed() for backwards compatibility."""
+    run_seed()
+
+
 if __name__ == "__main__":
     run_seed()
