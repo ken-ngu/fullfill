@@ -189,7 +189,7 @@ export function PatientContextBar({ ctx, onChange }: Props) {
   };
 
   return (
-    <div className="bg-white border border-slate-200 rounded-2xl shadow-card px-4 py-3 flex flex-wrap gap-4 items-end">
+    <div className="bg-white/60 border border-slate-200/60 rounded-xl px-5 py-4 flex flex-wrap gap-6 items-end">
       {/* Insurance Type */}
       <div>
         <label className="block text-xs font-medium mb-1 flex items-center gap-1.5">
@@ -200,7 +200,7 @@ export function PatientContextBar({ ctx, onChange }: Props) {
         <select
           value={ctx.insurance_type}
           onChange={(e) => handleInsuranceChange(e.target.value as InsuranceType)}
-          className="text-sm border border-slate-300 rounded-xl px-3 py-2 bg-white text-slate-900 outline-none min-h-[44px]"
+          className="text-sm border border-slate-200 rounded-lg px-3 py-2 bg-white hover:border-slate-300 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 text-slate-900 outline-none min-h-[44px] transition-all"
         >
           {INSURANCE_OPTIONS.map((o) => (
             <option key={o.value} value={o.value}>{o.label}</option>
@@ -220,7 +220,7 @@ export function PatientContextBar({ ctx, onChange }: Props) {
           <select
             value={ctx.plan_type || "PPO"}
             onChange={(e) => onChange({ ...ctx, plan_type: e.target.value as PlanType })}
-            className="text-sm border border-slate-300 rounded-xl px-3 py-2 bg-white text-slate-900 outline-none min-h-[44px]"
+            className="text-sm border border-slate-200 rounded-lg px-3 py-2 bg-white hover:border-slate-300 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 text-slate-900 outline-none min-h-[44px] transition-all"
           >
             {PLAN_TYPE_OPTIONS.map((o) => (
               <option key={o.value} value={o.value || ""}>{o.label}</option>
@@ -241,7 +241,7 @@ export function PatientContextBar({ ctx, onChange }: Props) {
           <select
             value={ctx.state || ""}
             onChange={(e) => onChange({ ...ctx, state: e.target.value || null })}
-            className="text-sm border border-slate-300 rounded-xl px-3 py-2 bg-white text-slate-900 outline-none min-h-[44px]"
+            className="text-sm border border-slate-200 rounded-lg px-3 py-2 bg-white hover:border-slate-300 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 text-slate-900 outline-none min-h-[44px] transition-all"
           >
             <option value="">Select state...</option>
             {US_STATES.map((s) => (
@@ -266,7 +266,7 @@ export function PatientContextBar({ ctx, onChange }: Props) {
           placeholder="e.g. 34"
           value={ctx.age ?? ""}
           onChange={(e) => onChange({ ...ctx, age: e.target.value ? Number(e.target.value) : null })}
-          className="text-sm border border-slate-300 rounded-xl px-3 py-2 bg-white text-slate-900 outline-none min-h-[44px] w-24"
+          className="text-sm border border-slate-200 rounded-lg px-3 py-2 bg-white hover:border-slate-300 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 text-slate-900 outline-none min-h-[44px] w-24 transition-all"
         />
         <p className="text-[10px] text-slate-500 mt-1">Auto-switches at 65+</p>
       </div>

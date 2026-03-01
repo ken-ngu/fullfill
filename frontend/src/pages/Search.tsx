@@ -96,18 +96,13 @@ export function Search({ specialty, setting, onSpecialtyChange, onNavigate, user
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       <Navbar variant="app" onNavigate={onNavigate} />
-      <div className="max-w-7xl mx-auto px-4 pt-20 pb-24">
-        {/* Header - Single column for search and controls */}
-        <div className="max-w-lg mx-auto">
-          <div className="flex items-center justify-between mb-5">
-            <div>
-              <h1 className="text-lg font-semibold text-sky-600">
-                {user ? `Welcome, ${user.name}` : "FullFill"}
-              </h1>
-              <p className="text-xs text-slate-500">Transparent prescription decisions</p>
-            </div>
+      <div className="max-w-7xl mx-auto px-4 pt-24 pb-24">
+        {/* Search and controls - Apple-inspired minimal layout */}
+        <div className="max-w-2xl mx-auto">
+          {/* Specialty selector - subtle, right-aligned */}
+          <div className="flex justify-end mb-6">
             <SpecialtySelector
               onSelect={onSpecialtyChange}
               currentSpecialty={specialty}
@@ -115,26 +110,26 @@ export function Search({ specialty, setting, onSpecialtyChange, onNavigate, user
             />
           </div>
 
-          {/* Patient context */}
-          <div className="mb-4">
-            <PatientContextBar ctx={ctx} onChange={handleCtxChange} />
+          {/* Search bar - hero element */}
+          <div className="mb-6">
+            <SearchBar onSelect={handleSearchSelect} specialty={specialty} setting={setting} />
           </div>
 
-          {/* Search */}
-          <div className="mb-4">
-            <SearchBar onSelect={handleSearchSelect} specialty={specialty} setting={setting} />
+          {/* Patient context - below search */}
+          <div className="mb-8">
+            <PatientContextBar ctx={ctx} onChange={handleCtxChange} />
           </div>
         </div>
 
         {/* Results */}
         {loading && (
-          <div className="max-w-lg mx-auto">
+          <div className="max-w-2xl mx-auto">
             <LoadingSkeleton />
           </div>
         )}
 
         {error && (
-          <div className="max-w-lg mx-auto">
+          <div className="max-w-2xl mx-auto">
             <div className="bg-red-50 border border-red-200 rounded-2xl p-4">
               <p className="text-sm text-red-700">{error}</p>
             </div>
@@ -144,9 +139,9 @@ export function Search({ specialty, setting, onSpecialtyChange, onNavigate, user
         {!loading && detail && (
           <>
             {/* Two-column layout on larger screens */}
-            <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.2fr] gap-6">
+            <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[1fr_1.2fr] gap-6">
               {/* Left column: Main medication details */}
-              <div className="bg-white border border-slate-200 shadow-card rounded-2xl p-6">
+              <div className="bg-white border border-slate-200 shadow-sm rounded-3xl p-6">
                 <div className="space-y-3 transition-opacity duration-150">
                   {/* Medication name */}
                   <div>
