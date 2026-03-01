@@ -52,6 +52,8 @@ class PatientContext(BaseModel):
     insurance_type: str = "commercial"   # commercial | medicare | medicaid | cash
     age: Optional[int] = None            # Used to infer age_group; not stored
     deductible_met: bool = False         # Has annual deductible been met?
+    plan_type: Optional[str] = None      # PPO | HMO | HSA (for commercial only)
+    state: Optional[str] = None          # Two-letter state code (for Medicaid)
 
 
 class MedicationDetail(MedicationSummary):

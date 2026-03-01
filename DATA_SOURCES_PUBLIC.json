@@ -1,0 +1,300 @@
+{
+  "page_title": "Data Sources & Methodology",
+  "page_subtitle": "Transparent. Evidence-based. Clinically validated.",
+  "last_updated": "2026-03-01",
+  "introduction": {
+    "heading": "How FullFill Works",
+    "content": "FullFill provides prescription cost transparency using only publicly available data sources. We believe patients and clinicians deserve to know where our information comes from and how we calculate our estimates.",
+    "key_points": [
+      "100% public data sources — no proprietary claims databases",
+      "Evidence-based algorithms validated by clinical pharmacists",
+      "Transparent methodology — all calculations documented",
+      "Regular updates from authoritative government and industry sources"
+    ]
+  },
+  "data_sources": {
+    "heading": "Our Data Sources",
+    "categories": [
+      {
+        "category": "Medication Pricing",
+        "icon": "currency-dollar",
+        "description": "Real-world prescription costs from national databases",
+        "sources": [
+          {
+            "name": "GoodRx Pricing Database",
+            "url": "https://www.goodrx.com",
+            "type": "Industry",
+            "description": "Aggregated cash-pay pricing from 70,000+ U.S. pharmacies. Provides cost ranges showing price variation across retail and independent pharmacies.",
+            "data_elements": ["Cash-pay prices", "Pharmacy comparisons", "Discount availability"],
+            "update_frequency": "Weekly",
+            "how_we_use_it": "Primary source for cost range estimates (low/high bounds)"
+          },
+          {
+            "name": "NADAC (National Average Drug Acquisition Cost)",
+            "url": "https://data.medicaid.gov",
+            "type": "Government (CMS)",
+            "description": "Official survey-based benchmark of pharmacy acquisition costs. Updated weekly by the Centers for Medicare & Medicaid Services.",
+            "data_elements": ["Pharmacy acquisition costs", "NDC-level pricing", "Weekly cost updates"],
+            "update_frequency": "Weekly",
+            "how_we_use_it": "Validation benchmark for pricing reasonableness, especially for generic medications"
+          },
+          {
+            "name": "Medicare Part D Spending Data",
+            "url": "https://data.cms.gov/summary-statistics-on-use-and-payments/medicare-medicaid-spending-by-drug/medicare-part-d-spending-by-drug",
+            "type": "Government (CMS)",
+            "description": "Annual prescription drug spending and utilization data for Medicare beneficiaries.",
+            "data_elements": ["Total spending per drug", "Beneficiary out-of-pocket costs", "Average cost per claim"],
+            "update_frequency": "Annual",
+            "how_we_use_it": "Trend analysis and validation of pricing ranges for Medicare population"
+          }
+        ]
+      },
+      {
+        "category": "Insurance & Formulary Data",
+        "icon": "document-check",
+        "description": "Coverage information from Medicare, Medicaid, and commercial plans",
+        "sources": [
+          {
+            "name": "CMS Medicare Part D Plan Finder",
+            "url": "https://www.medicare.gov/plan-compare",
+            "type": "Government (CMS)",
+            "description": "Official Medicare tool showing formulary tier placement, prior authorization requirements, and step therapy protocols across all Medicare Part D plans.",
+            "data_elements": ["Formulary tiers (1-5)", "Prior authorization flags", "Step therapy requirements", "Quantity limits"],
+            "update_frequency": "Annual (October)",
+            "how_we_use_it": "Reference standard for formulary tier assignments; model for typical commercial plan structures"
+          },
+          {
+            "name": "State Medicaid Preferred Drug Lists",
+            "url": "https://medicaid.gov/medicaid/prescription-drugs/",
+            "type": "Government (State Medicaid)",
+            "description": "State-specific lists of preferred medications with coverage criteria. Links to all 50+ state Medicaid formularies.",
+            "data_elements": ["Preferred drug status", "Prior authorization criteria", "State-specific restrictions"],
+            "update_frequency": "Quarterly (varies by state)",
+            "how_we_use_it": "Identification of medications requiring prior authorization; understanding state-level coverage variations"
+          },
+          {
+            "name": "Express Scripts National Preferred Formulary",
+            "url": "https://www.express-scripts.com/art/open-formularies/",
+            "type": "Industry (PBM)",
+            "description": "Publicly available formulary from one of the largest pharmacy benefit managers, representing typical commercial plan design.",
+            "data_elements": ["Tier placement", "Step therapy protocols", "Therapeutic alternatives"],
+            "update_frequency": "Quarterly",
+            "how_we_use_it": "Proxy for commercial insurance formulary patterns; identification of step therapy agents"
+          }
+        ]
+      },
+      {
+        "category": "Drug Information & Classification",
+        "icon": "beaker",
+        "description": "Official FDA and NIH databases for medication identification",
+        "sources": [
+          {
+            "name": "FDA National Drug Code (NDC) Directory",
+            "url": "https://www.accessdata.fda.gov/scripts/cder/ndc/",
+            "type": "Government (FDA)",
+            "description": "Official FDA database of all marketed drugs with unique identifiers. Updated daily.",
+            "data_elements": ["NDC codes", "Generic and brand names", "Dosage forms and strengths", "Active ingredients"],
+            "update_frequency": "Daily",
+            "how_we_use_it": "Drug identification and classification; linking brand to generic equivalents"
+          },
+          {
+            "name": "FDA Orange Book",
+            "url": "https://www.fda.gov/drugs/drug-approvals-and-databases/orange-book-data-files",
+            "type": "Government (FDA)",
+            "description": "Approved Drug Products with Therapeutic Equivalence Evaluations. Identifies which generic drugs are therapeutically equivalent to brand-name drugs.",
+            "data_elements": ["Therapeutic equivalence ratings", "Patent information", "Generic availability"],
+            "update_frequency": "Monthly",
+            "how_we_use_it": "Identification of therapeutically equivalent alternatives; determination of brand-only vs. generic availability"
+          },
+          {
+            "name": "RxNorm (National Library of Medicine)",
+            "url": "https://www.nlm.nih.gov/research/umls/rxnorm/",
+            "type": "Government (NLM)",
+            "description": "Standardized nomenclature for medications providing normalized names and unique identifiers.",
+            "data_elements": ["RxNorm identifiers (RxCUI)", "Standardized drug names", "Drug relationships"],
+            "update_frequency": "Monthly (plus weekly updates)",
+            "how_we_use_it": "Medication standardization; therapeutic class assignments; clinical equivalence grouping"
+          }
+        ]
+      },
+      {
+        "category": "Research & Evidence",
+        "icon": "academic-cap",
+        "description": "Peer-reviewed research on drug pricing and patient access",
+        "sources": [
+          {
+            "name": "Health Affairs Journal",
+            "url": "https://www.healthaffairs.org/topic/issue/25/drug-pricing",
+            "type": "Academic",
+            "description": "Leading health policy journal with peer-reviewed research on prescription drug pricing, insurance design, and cost transparency.",
+            "data_elements": ["Prescription abandonment rates", "Cost-sharing impact studies", "Price transparency effectiveness"],
+            "update_frequency": "Continuous",
+            "how_we_use_it": "Evidence base for fill risk scoring; understanding patient behavior related to cost barriers"
+          },
+          {
+            "name": "JAMA Network - Medication Costs Collection",
+            "url": "https://jamanetwork.com/collections/44035/medication-costs-and-access",
+            "type": "Academic",
+            "description": "Clinical research on medication costs, insurance coverage gaps, and patient access barriers.",
+            "data_elements": ["Adherence studies", "Cost barrier research", "Disparities in drug access"],
+            "update_frequency": "Continuous",
+            "how_we_use_it": "Clinical validation of cost impact on health outcomes; correlation between cost and adherence"
+          },
+          {
+            "name": "IQVIA Institute Reports",
+            "url": "https://www.iqvia.com/insights/the-iqvia-institute",
+            "type": "Industry Research",
+            "description": "Annual reports on medicine spending, patient assistance programs, and healthcare trends using pharmacy transaction data.",
+            "data_elements": ["Spending trends", "Generic utilization rates", "Patient assistance program usage"],
+            "update_frequency": "Annual reports",
+            "how_we_use_it": "Industry benchmarks for prior authorization approval rates; understanding market trends"
+          }
+        ]
+      }
+    ]
+  },
+  "methodology": {
+    "heading": "Our Methodology",
+    "sections": [
+      {
+        "title": "Cost Estimation",
+        "icon": "calculator",
+        "description": "How we calculate medication costs",
+        "details": [
+          "We provide cost ranges (low/high), not single estimates, because prescription prices vary significantly by pharmacy, insurance, and location",
+          "Low estimate: Minimum price using discount programs at low-cost pharmacies (e.g., Walmart, Costco)",
+          "High estimate: Typical retail price at major chains without insurance or discounts",
+          "All costs quoted for standard 30-day supply at typical maintenance dose",
+          "Cross-validated against multiple sources (GoodRx + NADAC + Medicare data)"
+        ]
+      },
+      {
+        "title": "Fill Risk Scoring",
+        "icon": "exclamation-triangle",
+        "description": "Predicting barriers to filling prescriptions",
+        "details": [
+          "Fill risk predicts access barriers, not cost — it answers 'Will my patient encounter problems getting this medication?'",
+          "Specialty-aware algorithm: Different specialties (dermatology, primary care, urgent care) face different insurance barriers",
+          "Four key barriers: Prior authorization required, brand-only (no generic), high formulary tier, step therapy required",
+          "Validated against academic research showing prescription abandonment rates",
+          "Output: LOW (likely to fill), MEDIUM (some barriers), HIGH (significant barriers expected)"
+        ]
+      },
+      {
+        "title": "Confidence Scores",
+        "icon": "chart-bar",
+        "description": "How reliable are our estimates?",
+        "details": [
+          "Confidence scores (0-100) reflect estimate reliability, NOT coverage likelihood",
+          "Generic medications = higher confidence (more predictable pricing)",
+          "Brand/specialty drugs = lower confidence (high price variability, manufacturer assistance unknown)",
+          "Version 1 uses public data (confidence 50-65 for best estimates)",
+          "Version 2 will integrate real-time benefit checks for patient-specific estimates (confidence 80-100)"
+        ]
+      },
+      {
+        "title": "Clinical Validation",
+        "icon": "shield-check",
+        "description": "Pharmacist-reviewed quality assurance",
+        "details": [
+          "All medications reviewed by board-certified clinical pharmacists",
+          "Therapeutic class assignments validated against clinical guidelines",
+          "Alternative medications reviewed for clinical appropriateness",
+          "Formulary tier assignments validated across 50+ Medicare Part D plans",
+          "Continuous quality monitoring and quarterly data updates"
+        ]
+      }
+    ]
+  },
+  "how_accurate": {
+    "heading": "How Accurate Are These Estimates?",
+    "qa_pairs": [
+      {
+        "question": "Will my patient pay exactly what FullFill shows?",
+        "answer": "Not exactly. We show cost ranges, not precise patient-specific amounts. Actual costs depend on your patient's specific insurance plan, deductible status, pharmacy choice, and eligibility for manufacturer assistance. Version 2 (coming soon) will provide patient-specific estimates using real-time benefit checks."
+      },
+      {
+        "question": "Why do some medications have wide cost ranges?",
+        "answer": "Prescription prices vary 80%+ between pharmacies for the same drug. Brand-name and specialty medications also have highly variable pricing depending on insurance coverage and manufacturer copay cards. Wide ranges reflect this real-world variability."
+      },
+      {
+        "question": "How often is the data updated?",
+        "answer": "Pricing data: Quarterly. Medicare formularies: Annual (October). Medicaid formularies: Quarterly. FDA drug databases: Monthly. Generic availability: Monthly. We refresh all data on a rolling schedule to maintain accuracy."
+      },
+      {
+        "question": "Does FullFill know my patient's specific insurance plan?",
+        "answer": "Not in Version 1. We use aggregated formulary data representing typical Medicare, Medicaid, and commercial plans. Version 2 will integrate with insurance systems to provide patient-specific coverage information when the patient consents to share their insurance details."
+      },
+      {
+        "question": "Why do confidence scores differ between medications?",
+        "answer": "Generic drugs in lower formulary tiers have predictable, stable pricing = high confidence. Brand-only specialty medications have variable pricing, unknown manufacturer assistance eligibility, and complex insurance coverage = low confidence. The score reflects data quality and price predictability."
+      },
+      {
+        "question": "What if the actual cost is different from the estimate?",
+        "answer": "This is expected and why we provide ranges with confidence scores. Encourage patients to: (1) Call their pharmacy for exact quotes, (2) Compare prices using GoodRx/RxSaver, (3) Ask about manufacturer copay cards for brand drugs, (4) Check patient assistance program eligibility."
+      }
+    ]
+  },
+  "limitations": {
+    "heading": "What We Can't Predict",
+    "disclaimer": "FullFill provides cost transparency based on public data, but cannot predict:",
+    "cannot_predict": [
+      "Patient-specific copay amounts (depends on individual plan design)",
+      "Whether your patient's deductible has been met",
+      "Eligibility for manufacturer copay assistance or patient assistance programs",
+      "Exact prior authorization approval likelihood for individual patients",
+      "Plan-specific formulary variations (10,000+ unique plans in the U.S.)",
+      "Pharmacy network restrictions or preferred pharmacy discounts",
+      "Real-time drug shortages or temporary availability issues"
+    ],
+    "best_practices": {
+      "heading": "Best Practices for Prescribers",
+      "recommendations": [
+        "Use FullFill cost estimates to inform initial prescribing decisions",
+        "Counsel patients that actual costs may vary and to check with their pharmacy",
+        "For brand medications, inform commercially insured patients about manufacturer copay cards",
+        "If patient reports high costs, consider therapeutic alternatives shown in FullFill",
+        "For medications requiring prior authorization, warn patients about potential delays",
+        "Encourage uninsured/underinsured patients to use discount programs (GoodRx, RxSaver)"
+      ]
+    }
+  },
+  "transparency_commitment": {
+    "heading": "Our Commitment to Transparency",
+    "content": "FullFill was built on the principle that prescription pricing should not be a mystery. Every cost estimate, formulary tier, and risk score in our application is backed by documented public data sources. We publish our methodology openly so clinicians and patients can understand — and trust — the information we provide.",
+    "principles": [
+      "Public data only: No proprietary claims databases or black-box algorithms",
+      "Documented sources: Every data point traced to authoritative government or academic source",
+      "Open methodology: All scoring algorithms published and explained",
+      "Clinical validation: Pharmacist review of all medication data",
+      "User feedback: Continuous improvement based on real-world prescriber and patient experiences",
+      "No conflicts of interest: Not sponsored by pharmaceutical companies, PBMs, or insurers"
+    ]
+  },
+  "call_to_action": {
+    "heading": "Questions About Our Data?",
+    "content": "We welcome feedback from clinicians and patients. If you encounter pricing discrepancies or have questions about our methodology, please reach out.",
+    "contact_methods": [
+      {
+        "method": "In-App Feedback",
+        "description": "Use the feedback button in the FullFill application to report data issues"
+      },
+      {
+        "method": "GitHub",
+        "description": "View our open-source code and methodology documentation"
+      }
+    ]
+  },
+  "version_info": {
+    "current_version": "1.0",
+    "version_description": "Public Data Model",
+    "next_version": "2.0 (Planned)",
+    "next_version_features": [
+      "Real-time pharmacy benefit checks (RTPB) for patient-specific estimates",
+      "Integration with major insurance systems",
+      "Patient assistance program eligibility screening",
+      "Drug shortage alerts",
+      "Expanded formulary coverage (top 50 commercial plans)"
+    ]
+  }
+}

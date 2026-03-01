@@ -1,5 +1,6 @@
 export type RiskLevel = "LOW" | "MEDIUM" | "HIGH";
 export type InsuranceType = "commercial" | "medicare" | "medicaid" | "cash";
+export type PlanType = "PPO" | "HMO" | "HSA" | null;
 
 export interface CostEstimate {
   low_usd: number;
@@ -61,4 +62,6 @@ export interface PatientContext {
   insurance_type: InsuranceType;
   age: number | null;
   deductible_met: boolean;
+  plan_type: PlanType;
+  state: string | null;
 }

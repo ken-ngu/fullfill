@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { Landing } from "./pages/Landing";
 import { About } from "./pages/About";
+import { DataSources } from "./pages/DataSources";
 import { Auth } from "./pages/Auth";
 import { Search } from "./pages/Search";
 
-type Page = "home" | "about" | "login" | "search";
+type Page = "home" | "about" | "data-sources" | "login" | "search";
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState<Page>("home");
@@ -61,6 +62,10 @@ export default function App() {
 
   if (currentPage === "about") {
     return <About onNavigate={handleNavigate} />;
+  }
+
+  if (currentPage === "data-sources") {
+    return <DataSources onNavigate={handleNavigate} />;
   }
 
   if (currentPage === "login") {

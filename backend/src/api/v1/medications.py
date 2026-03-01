@@ -26,12 +26,14 @@ def _cost_estimate(med: dict, ctx: PatientContext | None = None) -> CostEstimate
         high_usd = med["cost_high_usd"]
         label = "Estimated range"
     else:
-        # Calculate insurance-specific pricing
+        # Calculate insurance-specific pricing with plan type and state
         low_usd, high_usd, price_type = calculate_patient_cost(
             med,
             insurance_type=ctx.insurance_type,
             age=ctx.age,
             deductible_met=ctx.deductible_met,
+            plan_type=ctx.plan_type,
+            state=ctx.state,
         )
         label = get_price_type_label(price_type)
 
@@ -112,6 +114,8 @@ def get_medication(
     insurance_type: str = Query("commercial"),
     age: int | None = Query(None, ge=0, le=120),
     deductible_met: bool = Query(False),
+    plan_type: str | None = Query(None),
+    state: str | None = Query(None),
     specialty: str | None = Query(None),
     repo: AbstractMedicationRepository = Depends(get_medication_repo),
 ) -> MedicationDetail:
@@ -132,6 +136,8 @@ def get_medication(
         insurance_type=insurance_type,
         age=age,
         deductible_met=deductible_met,
+        plan_type=plan_type,
+        state=state,
     )
 
     alternatives = [

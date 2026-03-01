@@ -44,6 +44,8 @@ export async function getMedication(
     specialty,
   });
   if (ctx.age !== null && ctx.age !== undefined) params.set("age", String(ctx.age));
+  if (ctx.plan_type !== null && ctx.plan_type !== undefined) params.set("plan_type", ctx.plan_type);
+  if (ctx.state !== null && ctx.state !== undefined) params.set("state", ctx.state);
   return apiFetch<MedicationDetail>(`/api/v1/medications/${encodeURIComponent(id)}?${params}`);
 }
 

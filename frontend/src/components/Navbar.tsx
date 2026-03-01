@@ -44,6 +44,12 @@ export function Navbar({ variant = "landing", onNavigate }: NavbarProps) {
                   About
                 </button>
                 <button
+                  onClick={() => handleNavClick("data-sources")}
+                  className="text-sm text-slate-600 hover:text-slate-900 transition-colors"
+                >
+                  Data Sources
+                </button>
+                <button
                   onClick={() => handleNavClick("search")}
                   className="text-sm text-slate-600 hover:text-slate-900 transition-colors"
                 >
@@ -64,6 +70,12 @@ export function Navbar({ variant = "landing", onNavigate }: NavbarProps) {
                   className="text-sm text-slate-600 hover:text-slate-900 transition-colors"
                 >
                   About
+                </button>
+                <button
+                  onClick={() => handleNavClick("data-sources")}
+                  className="text-sm text-slate-600 hover:text-slate-900 transition-colors"
+                >
+                  Data Sources
                 </button>
                 <button
                   onClick={() => handleNavClick("profile")}
@@ -120,6 +132,12 @@ export function Navbar({ variant = "landing", onNavigate }: NavbarProps) {
                   About
                 </button>
                 <button
+                  onClick={() => handleNavClick("data-sources")}
+                  className="block w-full text-left text-sm text-slate-600 hover:text-slate-900 transition-colors py-2"
+                >
+                  Data Sources
+                </button>
+                <button
                   onClick={() => handleNavClick("search")}
                   className="block w-full text-left text-sm text-slate-600 hover:text-slate-900 transition-colors py-2"
                 >
@@ -140,6 +158,12 @@ export function Navbar({ variant = "landing", onNavigate }: NavbarProps) {
                   className="block w-full text-left text-sm text-slate-600 hover:text-slate-900 transition-colors py-2"
                 >
                   About
+                </button>
+                <button
+                  onClick={() => handleNavClick("data-sources")}
+                  className="block w-full text-left text-sm text-slate-600 hover:text-slate-900 transition-colors py-2"
+                >
+                  Data Sources
                 </button>
                 <button
                   onClick={() => handleNavClick("profile")}

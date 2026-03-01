@@ -7,6 +7,8 @@ import { FillRiskBanner } from "../components/FillRiskBanner";
 import { CostCard } from "../components/CostCard";
 import { PAStatusCard } from "../components/PAStatusCard";
 import { AlternativesDrawer } from "../components/AlternativesDrawer";
+import { AlternativesTable } from "../components/AlternativesTable";
+import { NoAlternatives } from "../components/NoAlternatives";
 import { LoadingSkeleton } from "../components/LoadingSkeleton";
 import { PatientContextBar } from "../components/PatientContextBar";
 import { SpecialtySelector } from "../components/SpecialtySelector";
@@ -37,6 +39,8 @@ export function Search({ specialty, setting, onSpecialtyChange, onNavigate, user
     insurance_type: "commercial",
     age: null,
     deductible_met: false,
+    plan_type: "PPO",
+    state: null,
   });
   const ctxRef = useRef(ctx);
   ctxRef.current = ctx;
@@ -94,73 +98,119 @@ export function Search({ specialty, setting, onSpecialtyChange, onNavigate, user
   return (
     <div className="min-h-screen bg-slate-50">
       <Navbar variant="app" onNavigate={onNavigate} />
-      <div className="max-w-lg mx-auto px-4 pt-20 pb-24">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-5">
-          <div>
-            <h1 className="text-lg font-semibold text-sky-600">
-              {user ? `Welcome, ${user.name}` : "FullFill"}
-            </h1>
-            <p className="text-xs text-slate-500">Transparent prescription decisions</p>
+      <div className="max-w-7xl mx-auto px-4 pt-20 pb-24">
+        {/* Header - Single column for search and controls */}
+        <div className="max-w-lg mx-auto">
+          <div className="flex items-center justify-between mb-5">
+            <div>
+              <h1 className="text-lg font-semibold text-sky-600">
+                {user ? `Welcome, ${user.name}` : "FullFill"}
+              </h1>
+              <p className="text-xs text-slate-500">Transparent prescription decisions</p>
+            </div>
+            <SpecialtySelector
+              onSelect={onSpecialtyChange}
+              currentSpecialty={specialty}
+              currentSetting={setting}
+            />
           </div>
-          <SpecialtySelector
-            onSelect={onSpecialtyChange}
-            currentSpecialty={specialty}
-            currentSetting={setting}
-          />
-        </div>
 
-        {/* Patient context */}
-        <div className="mb-4">
-          <PatientContextBar ctx={ctx} onChange={handleCtxChange} />
-        </div>
+          {/* Patient context */}
+          <div className="mb-4">
+            <PatientContextBar ctx={ctx} onChange={handleCtxChange} />
+          </div>
 
-        {/* Search */}
-        <div className="mb-4">
-          <SearchBar onSelect={handleSearchSelect} specialty={specialty} setting={setting} />
+          {/* Search */}
+          <div className="mb-4">
+            <SearchBar onSelect={handleSearchSelect} specialty={specialty} setting={setting} />
+          </div>
         </div>
 
         {/* Results */}
-        {loading && <LoadingSkeleton />}
+        {loading && (
+          <div className="max-w-lg mx-auto">
+            <LoadingSkeleton />
+          </div>
+        )}
 
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-2xl p-4">
-            <p className="text-sm text-red-700">{error}</p>
+          <div className="max-w-lg mx-auto">
+            <div className="bg-red-50 border border-red-200 rounded-2xl p-4">
+              <p className="text-sm text-red-700">{error}</p>
+            </div>
           </div>
         )}
 
         {!loading && detail && (
-          <div className="space-y-3 transition-opacity duration-150">
-            {/* Medication name */}
-            <div>
-              <p className="text-base font-semibold text-slate-900">{detail.name}</p>
-              <p className="text-xs text-slate-500">{detail.generic_name} · {detail.dosage_form} · {detail.strength}</p>
+          <>
+            {/* Two-column layout on larger screens */}
+            <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.2fr] gap-6">
+              {/* Left column: Main medication details */}
+              <div className="bg-white border border-slate-200 shadow-card rounded-2xl p-6">
+                <div className="space-y-3 transition-opacity duration-150">
+                  {/* Medication name */}
+                  <div>
+                    <p className="text-base font-semibold text-slate-900">{detail.name}</p>
+                    <p className="text-xs text-slate-500">{detail.generic_name} · {detail.dosage_form} · {detail.strength}</p>
+                  </div>
+
+                  {/* 1. Fill risk (dominant) */}
+                  <FillRiskBanner
+                    level={detail.fill_risk_level}
+                    plainLanguage={detail.fill_risk_plain_language}
+                    reasons={detail.fill_risk_reasons}
+                  />
+
+                  {/* 2. Cost + PA side by side */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <CostCard estimate={detail.cost_estimate} confidenceScore={detail.confidence_score} />
+                    <PAStatusCard pa={detail.pa_status} />
+                  </div>
+
+                  {/* Mobile-only: Alternatives drawer for small screens */}
+                  <div className="lg:hidden">
+                    {detail.alternatives.length > 0 ? (
+                      <AlternativesDrawer
+                        alternatives={detail.alternatives}
+                        onSwitch={handleSwitch}
+                      />
+                    ) : (
+                      <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 text-center">
+                        <p className="text-sm font-medium text-slate-700 mb-1">
+                          No Alternatives Found
+                        </p>
+                        <p className="text-xs text-slate-500">
+                          This may already be the most cost-effective option.
+                        </p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Disclaimer */}
+                  <p className="text-xs text-slate-400 px-1">
+                    Estimates based on public formulary data. Not a guarantee of patient cost.
+                  </p>
+                </div>
+              </div>
+
+              {/* Right column: Alternatives table or no alternatives message (desktop only) */}
+              <div className="hidden lg:block">
+                {detail.alternatives.length > 0 ? (
+                  <AlternativesTable
+                    alternatives={detail.alternatives}
+                    primaryCostLow={detail.cost_estimate.low_usd}
+                    primaryCostHigh={detail.cost_estimate.high_usd}
+                    onSwitch={handleSwitch}
+                  />
+                ) : (
+                  <NoAlternatives
+                    medicationName={detail.name}
+                    medicationId={detail.id}
+                  />
+                )}
+              </div>
             </div>
-
-            {/* 1. Fill risk (dominant) */}
-            <FillRiskBanner
-              level={detail.fill_risk_level}
-              plainLanguage={detail.fill_risk_plain_language}
-              reasons={detail.fill_risk_reasons}
-            />
-
-            {/* 2. Cost + PA side by side */}
-            <div className="grid grid-cols-2 gap-3">
-              <CostCard estimate={detail.cost_estimate} confidenceScore={detail.confidence_score} />
-              <PAStatusCard pa={detail.pa_status} />
-            </div>
-
-            {/* 3. Alternatives (collapsed) */}
-            <AlternativesDrawer
-              alternatives={detail.alternatives}
-              onSwitch={handleSwitch}
-            />
-
-            {/* Disclaimer */}
-            <p className="text-xs text-slate-400 px-1">
-              Estimates based on public formulary data. Not a guarantee of patient cost.
-            </p>
-          </div>
+          </>
         )}
       </div>
     </div>
