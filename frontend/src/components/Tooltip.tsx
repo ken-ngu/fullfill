@@ -62,7 +62,7 @@ export function Tooltip({ content, children, variant = "icon" }: Props) {
   useEffect(() => {
     if (!isVisible) return;
 
-    const handleClickOutside = (e: MouseEvent) => {
+    const handleClickOutside = (e: MouseEvent | TouchEvent) => {
       if (
         triggerRef.current &&
         tooltipRef.current &&
@@ -74,7 +74,11 @@ export function Tooltip({ content, children, variant = "icon" }: Props) {
     };
 
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener("touchstart", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
+    };
   }, [isVisible]);
 
   const handleToggle = (e: React.MouseEvent | React.TouchEvent) => {
@@ -97,36 +101,47 @@ export function Tooltip({ content, children, variant = "icon" }: Props) {
 
   // Position-specific styles
   const getTooltipPositionStyles = (): string => {
-    // Responsive width: smaller on mobile, normal on desktop
-    const baseStyles = "absolute w-[calc(100vw-2rem)] max-w-[320px] sm:w-80 z-50";
+    // On mobile: fixed positioning centered on screen
+    // On desktop: absolute positioning relative to trigger
+    const mobileStyles = "fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100vw-2rem)] max-w-[320px] z-50";
+    const desktopBaseStyles = "absolute w-80 z-50";
 
+    // Use fixed centered position on mobile screens
+    if (window.innerWidth < 640) { // sm breakpoint
+      return mobileStyles;
+    }
+
+    // Desktop positioning relative to trigger
     switch (position) {
       case "bottom":
-        return `${baseStyles} left-1/2 -translate-x-1/2 top-full mt-2`;
+        return `${desktopBaseStyles} left-1/2 -translate-x-1/2 top-full mt-2`;
       case "top":
-        return `${baseStyles} left-1/2 -translate-x-1/2 bottom-full mb-2`;
+        return `${desktopBaseStyles} left-1/2 -translate-x-1/2 bottom-full mb-2`;
       case "right":
-        return `${baseStyles} left-full top-1/2 -translate-y-1/2 ml-2`;
+        return `${desktopBaseStyles} left-full top-1/2 -translate-y-1/2 ml-2`;
       case "left":
-        return `${baseStyles} right-full top-1/2 -translate-y-1/2 mr-2`;
+        return `${desktopBaseStyles} right-full top-1/2 -translate-y-1/2 mr-2`;
       default:
-        return `${baseStyles} left-1/2 -translate-x-1/2 top-full mt-2`;
+        return `${desktopBaseStyles} left-1/2 -translate-x-1/2 top-full mt-2`;
     }
   };
 
   // Arrow position styles
   const getArrowStyles = (): string => {
+    // Hide arrow on mobile (since tooltip is centered, arrow doesn't point to trigger)
+    const baseStyles = "hidden sm:block absolute";
+
     switch (position) {
       case "bottom":
-        return "absolute left-1/2 -translate-x-1/2 bottom-full border-8 border-transparent border-b-slate-900";
+        return `${baseStyles} left-1/2 -translate-x-1/2 bottom-full border-8 border-transparent border-b-slate-900`;
       case "top":
-        return "absolute left-1/2 -translate-x-1/2 top-full border-8 border-transparent border-t-slate-900";
+        return `${baseStyles} left-1/2 -translate-x-1/2 top-full border-8 border-transparent border-t-slate-900`;
       case "right":
-        return "absolute right-full top-1/2 -translate-y-1/2 border-8 border-transparent border-r-slate-900";
+        return `${baseStyles} right-full top-1/2 -translate-y-1/2 border-8 border-transparent border-r-slate-900`;
       case "left":
-        return "absolute left-full top-1/2 -translate-y-1/2 border-8 border-transparent border-l-slate-900";
+        return `${baseStyles} left-full top-1/2 -translate-y-1/2 border-8 border-transparent border-l-slate-900`;
       default:
-        return "absolute left-1/2 -translate-x-1/2 bottom-full border-8 border-transparent border-b-slate-900";
+        return `${baseStyles} left-1/2 -translate-x-1/2 bottom-full border-8 border-transparent border-b-slate-900`;
     }
   };
 
@@ -149,14 +164,18 @@ export function Tooltip({ content, children, variant = "icon" }: Props) {
           {children}
         </div>
         {isVisible && (
-          <div ref={tooltipRef} className={getTooltipPositionStyles()}>
-            <div className="bg-slate-900 text-white text-xs rounded-xl shadow-2xl p-4 border border-slate-700 animate-in fade-in duration-150">
-              <div className="prose prose-invert prose-sm max-w-none">
-                {content}
+          <>
+            {/* Mobile backdrop */}
+            <div className="sm:hidden fixed inset-0 bg-black/30 z-40 animate-in fade-in duration-150" />
+            <div ref={tooltipRef} className={getTooltipPositionStyles()}>
+              <div className="bg-slate-900 text-white text-xs rounded-xl shadow-2xl p-4 border border-slate-700 animate-in fade-in duration-150">
+                <div className="prose prose-invert prose-sm max-w-none">
+                  {content}
+                </div>
+                <div className={getArrowStyles()} />
               </div>
-              <div className={getArrowStyles()} />
             </div>
-          </div>
+          </>
         )}
       </div>
     );
@@ -183,14 +202,18 @@ export function Tooltip({ content, children, variant = "icon" }: Props) {
         <span className="text-xs sm:text-[9px]">i</span>
       </button>
       {isVisible && (
-        <div ref={tooltipRef} className={getTooltipPositionStyles()}>
-          <div className="bg-slate-900 text-white text-xs rounded-xl shadow-2xl p-4 border border-slate-700 animate-in fade-in duration-150">
-            <div className="prose prose-invert prose-sm max-w-none">
-              {content}
+        <>
+          {/* Mobile backdrop */}
+          <div className="sm:hidden fixed inset-0 bg-black/30 z-40 animate-in fade-in duration-150" />
+          <div ref={tooltipRef} className={getTooltipPositionStyles()}>
+            <div className="bg-slate-900 text-white text-xs rounded-xl shadow-2xl p-4 border border-slate-700 animate-in fade-in duration-150">
+              <div className="prose prose-invert prose-sm max-w-none">
+                {content}
+              </div>
+              <div className={getArrowStyles()} />
             </div>
-            <div className={getArrowStyles()} />
           </div>
-        </div>
+        </>
       )}
       {children}
     </div>
