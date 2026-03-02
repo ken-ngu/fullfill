@@ -16,7 +16,7 @@ _engine = create_engine(
     pool_size=10,              # Maximum 10 concurrent connections in the pool
     max_overflow=20,           # Allow up to 20 additional connections during peak load
     pool_recycle=3600,         # Recycle connections after 1 hour to prevent stale connections
-    pool_pre_ping=True,        # Test connection health before using (prevents stale connection errors)
+    pool_pre_ping=False,       # Disabled to eliminate PING overhead (was adding 100-200ms per request)
     echo=False,                # Disable SQL query logging (set to True for debugging)
     connect_args={
         "connect_timeout": 10,              # 10 second connection timeout

@@ -52,8 +52,8 @@ def get_redis_client() -> Optional[redis.Redis]:
             _redis_client = redis.from_url(
                 settings.redis_url,
                 decode_responses=True,  # Automatically decode bytes to strings
-                socket_connect_timeout=2,
-                socket_timeout=2,
+                socket_connect_timeout=0.5,  # Reduced from 2s to 500ms
+                socket_timeout=0.5,          # Reduced from 2s to 500ms
                 retry_on_timeout=True,
                 health_check_interval=30,
             )
