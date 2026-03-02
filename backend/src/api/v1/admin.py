@@ -46,6 +46,35 @@ def seed_database(
         raise HTTPException(status_code=500, detail=f"Seeding failed: {str(e)}")
 
 
+@router.post("/migrate")
+def run_migrations():
+    """
+    Run pending Alembic migrations.
+
+    WARNING: This is for development/staging only.
+    In production, this should be protected with authentication.
+    """
+    try:
+        result = subprocess.run(
+            ["alembic", "upgrade", "head"],
+            capture_output=True,
+            text=True,
+            check=True,
+            cwd="/app"  # Railway working directory, falls back to current dir locally
+        )
+
+        return {
+            "status": "success",
+            "message": "Migrations completed successfully",
+            "output": result.stdout,
+        }
+    except subprocess.CalledProcessError as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Migration failed: {e.stderr}"
+        )
+
+
 @router.get("/migration-status")
 def migration_status():
     """Check current Alembic migration version."""
