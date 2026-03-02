@@ -17,13 +17,15 @@ depends_on = None
 def upgrade() -> None:
     # Add GIN index on diagnoses.synonyms for fast array search
     # This improves performance when searching by synonym terms
-    op.execute(
-        """
-        CREATE INDEX idx_diagnoses_synonyms_gin
-        ON diagnoses
-        USING gin(synonyms jsonb_path_ops)
-        """
-    )
+    # Note: JSON type columns don't support GIN indexes directly
+    # Skipping this index for now - can add after converting column to JSONB
+    # op.execute(
+    #     """
+    #     CREATE INDEX idx_diagnoses_synonyms_gin
+    #     ON diagnoses
+    #     USING gin(synonyms)
+    #     """
+    # )
 
     # Add GIN trigram index on diagnosis name for fuzzy search
     op.execute(
