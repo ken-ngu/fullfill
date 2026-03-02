@@ -73,8 +73,9 @@ DIAGNOSES: list[dict] = [
         "synonyms": ["athlete's foot", "foot fungus", "ringworm of foot"],
         "category": "fungal_infection",
         "medication_ids": [
-            "terbinafine-250mg-tablet",
             "clotrimazole-1pct-cream",
+            "miconazole-2pct-cream",
+            "terbinafine-250mg-tablet",
         ],
     },
     {
@@ -86,6 +87,7 @@ DIAGNOSES: list[dict] = [
         "category": "fungal_infection",
         "medication_ids": [
             "clotrimazole-1pct-cream",
+            "miconazole-2pct-cream",
             "terbinafine-250mg-tablet",
         ],
     },
@@ -98,6 +100,7 @@ DIAGNOSES: list[dict] = [
         "category": "fungal_infection",
         "medication_ids": [
             "clotrimazole-1pct-cream",
+            "miconazole-2pct-cream",
             "terbinafine-250mg-tablet",
         ],
     },
@@ -109,8 +112,9 @@ DIAGNOSES: list[dict] = [
         "synonyms": ["yeast infection", "vaginal yeast infection", "thrush"],
         "category": "fungal_infection",
         "medication_ids": [
-            "fluconazole-150mg-tablet",
+            "miconazole-2pct-cream",
             "clotrimazole-1pct-cream",
+            "fluconazole-150mg-tablet",
         ],
     },
     {
@@ -273,7 +277,10 @@ DIAGNOSES: list[dict] = [
         "synonyms": ["migraine", "severe headache"],
         "category": "neurologic",
         "medication_ids": [
+            "acetaminophen-500mg-tablet",
+            "ibuprofen-800mg-tablet-uc",
             "naproxen-500mg-tablet",
+            "aspirin-325mg-tablet",
         ],
     },
     {
@@ -399,7 +406,13 @@ DIAGNOSES: list[dict] = [
         "description": "Inflammation of nasal passages due to allergens, causing sneezing, runny nose, and congestion.",
         "synonyms": ["hay fever", "seasonal allergies", "allergies"],
         "category": "allergic",
-        "medication_ids": [],
+        "medication_ids": [
+            "loratadine-10mg-tablet",
+            "cetirizine-10mg-tablet",
+            "fexofenadine-180mg-tablet",
+            "diphenhydramine-25mg-capsule",
+            "pseudoephedrine-30mg-tablet",
+        ],
     },
     {
         "id": "urticaria",
@@ -409,6 +422,10 @@ DIAGNOSES: list[dict] = [
         "synonyms": ["hives", "welts"],
         "category": "allergic",
         "medication_ids": [
+            "diphenhydramine-25mg-capsule",
+            "loratadine-10mg-tablet",
+            "cetirizine-10mg-tablet",
+            "fexofenadine-180mg-tablet",
             "prednisone-20mg-tablet-uc",
         ],
     },
@@ -774,6 +791,93 @@ DIAGNOSES: list[dict] = [
         "category": "neurologic",
         "medication_ids": [
             "meclizine-25mg-tablet",
+        ],
+    },
+
+    # ─── COMMON SYMPTOMS & CONDITIONS (OTC) ─────────────────────────────────
+    {
+        "id": "gerd",
+        "name": "Gastroesophageal Reflux Disease (GERD)",
+        "icd10_codes": ["K21.9"],
+        "description": "Chronic acid reflux causing heartburn and regurgitation.",
+        "synonyms": ["heartburn", "acid reflux", "GERD"],
+        "category": "gastrointestinal",
+        "medication_ids": [
+            "omeprazole-20mg-capsule",
+            "famotidine-20mg-tablet",
+            "esomeprazole-40mg-tablet-uc",
+        ],
+    },
+    {
+        "id": "acute-diarrhea",
+        "name": "Acute Diarrhea",
+        "icd10_codes": ["K59.1"],
+        "description": "Sudden onset of loose, watery stools.",
+        "synonyms": ["diarrhea", "loose stools"],
+        "category": "gastrointestinal",
+        "medication_ids": [
+            "loperamide-2mg-capsule",
+            "bismuth-subsalicylate-262mg-tablet",
+        ],
+    },
+    {
+        "id": "constipation",
+        "name": "Constipation",
+        "icd10_codes": ["K59.00"],
+        "description": "Difficulty passing stools or infrequent bowel movements.",
+        "synonyms": ["constipation", "difficulty passing stools"],
+        "category": "gastrointestinal",
+        "medication_ids": [
+            "polyethylene-glycol-3350-powder",
+            "docusate-sodium-100mg-capsule",
+        ],
+    },
+    {
+        "id": "acute-cough",
+        "name": "Acute Cough",
+        "icd10_codes": ["R05.9"],
+        "description": "Sudden onset cough often due to upper respiratory infection.",
+        "synonyms": ["cough", "dry cough", "productive cough"],
+        "category": "respiratory",
+        "medication_ids": [
+            "dextromethorphan-30mg-capsule",
+            "guaifenesin-400mg-tablet",
+        ],
+    },
+    {
+        "id": "insomnia",
+        "name": "Insomnia",
+        "icd10_codes": ["G47.00"],
+        "description": "Difficulty falling asleep or staying asleep.",
+        "synonyms": ["trouble sleeping", "sleeplessness", "insomnia"],
+        "category": "neurologic",
+        "medication_ids": [
+            "diphenhydramine-25mg-capsule",
+        ],
+    },
+    {
+        "id": "tension-headache",
+        "name": "Tension Headache",
+        "icd10_codes": ["G44.209"],
+        "description": "Mild to moderate headache often described as a tight band around the head.",
+        "synonyms": ["headache", "tension headache"],
+        "category": "neurologic",
+        "medication_ids": [
+            "acetaminophen-500mg-tablet",
+            "ibuprofen-800mg-tablet-uc",
+            "aspirin-325mg-tablet",
+            "naproxen-500mg-tablet",
+        ],
+    },
+    {
+        "id": "nasal-congestion",
+        "name": "Nasal Congestion",
+        "icd10_codes": ["J34.89"],
+        "description": "Stuffy nose and difficulty breathing through the nose.",
+        "synonyms": ["stuffy nose", "congestion", "blocked nose"],
+        "category": "respiratory",
+        "medication_ids": [
+            "pseudoephedrine-30mg-tablet",
         ],
     },
 ]
