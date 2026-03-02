@@ -1,4 +1,5 @@
 from sqlalchemy import Column, String, Float, Boolean, Integer, Date, JSON
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import DeclarativeBase, relationship
 
 
@@ -13,7 +14,7 @@ class Medication(Base):
     id = Column(String, primary_key=True)
     name = Column(String, nullable=False)
     generic_name = Column(String, nullable=False)
-    brand_names = Column(JSON, nullable=False, default=list)
+    brand_names = Column(JSONB, nullable=False, default=list)
 
     # Multi-specialty classification
     specialty = Column(String, nullable=False, default="dermatology")
@@ -44,18 +45,18 @@ class Medication(Base):
     brand_only = Column(Boolean, nullable=False, default=False)
     formulary_tier = Column(Integer, nullable=False, default=2)
     step_therapy_required = Column(Boolean, nullable=False, default=False)
-    step_therapy_agents = Column(JSON, nullable=False, default=list)
+    step_therapy_agents = Column(JSONB, nullable=False, default=list)
 
     # OTC flag
     is_otc = Column(Boolean, nullable=False, default=False)
 
     # RTPB identifiers (empty for v1, critical for v2)
-    ndc_codes = Column(JSON, nullable=False, default=list)
+    ndc_codes = Column(JSONB, nullable=False, default=list)
     rxnorm_cui = Column(String, nullable=True)
     gpi_code = Column(String, nullable=True)
 
     # Alternative pointers
-    alternative_ids = Column(JSON, nullable=False, default=list)
+    alternative_ids = Column(JSONB, nullable=False, default=list)
 
     # Metadata
     data_source = Column(String, nullable=False, default="public-data")
