@@ -5,9 +5,11 @@ This module provides a simple caching layer to reduce database load and improve
 response times for frequently accessed data.
 
 Cache Strategy:
-- Search results: 5 minute TTL (frequently changing user behavior)
-- Medication details: 15 minute TTL (relatively static data)
-- Top medications: 10 minute TTL (periodic updates)
+- All cached data: 10 hour TTL (long-lived cache for static medication/diagnosis data)
+- Search results: 10 hours - search results
+- Medication details: 10 hours - medication details
+- Top medications: 10 hours - top medications
+- Diagnosis details: 10 hours - diagnosis details
 
 All cache keys are namespaced to avoid collisions.
 """
@@ -166,10 +168,11 @@ def build_cache_key(*parts: str) -> str:
 
 
 # Cache TTL constants (in seconds)
-CACHE_TTL_SEARCH = 300          # 5 minutes - search results
-CACHE_TTL_MEDICATION = 900      # 15 minutes - medication details
-CACHE_TTL_TOP = 600             # 10 minutes - top medications
-CACHE_TTL_DIAGNOSIS = 900       # 15 minutes - diagnosis details
+# 10 hours = 36000 seconds - long-lived cache for static data
+CACHE_TTL_SEARCH = 36000        # 10 hours - search results
+CACHE_TTL_MEDICATION = 36000    # 10 hours - medication details
+CACHE_TTL_TOP = 36000           # 10 hours - top medications
+CACHE_TTL_DIAGNOSIS = 36000     # 10 hours - diagnosis details
 
 
 def cached(ttl: int = 300, key_prefix: str = ""):
