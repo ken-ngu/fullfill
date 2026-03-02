@@ -4,7 +4,7 @@ For development/staging use only - should be protected in production.
 """
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from src.database import get_session_local
+from src.dependencies import get_db
 import subprocess
 import sys
 
@@ -13,7 +13,7 @@ router = APIRouter(prefix="/admin", tags=["admin"])
 
 @router.post("/seed-database")
 def seed_database(
-    db: Session = Depends(get_session_local)
+    db: Session = Depends(get_db)
 ):
     """
     Seed the database with initial data.
