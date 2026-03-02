@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Analytics } from "@vercel/analytics/react";
 import { Landing } from "./pages/Landing";
 import { About } from "./pages/About";
 import { DataSources } from "./pages/DataSources";
@@ -75,45 +76,81 @@ export default function App() {
   }
 
   if (currentPage === "home") {
-    return <Landing onContinue={handleContinue} onNavigate={handleNavigate} />;
+    return (
+      <>
+        <Landing onContinue={handleContinue} onNavigate={handleNavigate} />
+        <Analytics />
+      </>
+    );
   }
 
   if (currentPage === "about") {
-    return <About onNavigate={handleNavigate} />;
+    return (
+      <>
+        <About onNavigate={handleNavigate} />
+        <Analytics />
+      </>
+    );
   }
 
   if (currentPage === "data-sources") {
-    return <DataSources onNavigate={handleNavigate} />;
+    return (
+      <>
+        <DataSources onNavigate={handleNavigate} />
+        <Analytics />
+      </>
+    );
   }
 
   if (currentPage === "login") {
-    return <Auth onNavigate={handleNavigate} onAuth={handleAuth} />;
+    return (
+      <>
+        <Auth onNavigate={handleNavigate} onAuth={handleAuth} />
+        <Analytics />
+      </>
+    );
   }
 
   if (currentPage === "diagnosis" && currentDiagnosisId) {
     return (
-      <DiagnosisDetail
-        diagnosisId={currentDiagnosisId}
-        patientContext={patientContext}
-        onNavigateToMedication={() => handleNavigate("search")}
-      />
+      <>
+        <DiagnosisDetail
+          diagnosisId={currentDiagnosisId}
+          patientContext={patientContext}
+          onNavigateToMedication={() => handleNavigate("search")}
+        />
+        <Analytics />
+      </>
     );
   }
 
   if (currentPage === "admin340b") {
-    return <Admin340B onNavigate={handleNavigate} />;
+    return (
+      <>
+        <Admin340B onNavigate={handleNavigate} />
+        <Analytics />
+      </>
+    );
   }
 
   if (currentPage === "order-review" && currentOrderId) {
-    return <OrderReview340B orderId={currentOrderId} onNavigate={handleNavigate} />;
+    return (
+      <>
+        <OrderReview340B orderId={currentOrderId} onNavigate={handleNavigate} />
+        <Analytics />
+      </>
+    );
   }
 
   return (
-    <Search
-      specialty={specialty}
-      setting={setting}
-      onSpecialtyChange={handleSpecialtyChange}
-      onNavigate={handleNavigate}
-    />
+    <>
+      <Search
+        specialty={specialty}
+        setting={setting}
+        onSpecialtyChange={handleSpecialtyChange}
+        onNavigate={handleNavigate}
+      />
+      <Analytics />
+    </>
   );
 }
