@@ -97,19 +97,3 @@ def migration_status():
             "error": e.stderr,
             "python_version": sys.version
         }
-
-
-@router.get("/seed-info")
-def seed_info():
-    """Check how many medications are in the seed data."""
-    from src.data.seed import MEDICATIONS
-
-    # Check if acetaminophen-500mg-tablet is in the list
-    has_tylenol = any(m["id"] == "acetaminophen-500mg-tablet" for m in MEDICATIONS)
-    tylenol_med = next((m for m in MEDICATIONS if m["id"] == "acetaminophen-500mg-tablet"), None)
-
-    return {
-        "total_medications_in_seed": len(MEDICATIONS),
-        "has_acetaminophen_500mg": has_tylenol,
-        "tylenol_details": tylenol_med if tylenol_med else "Not found",
-    }
