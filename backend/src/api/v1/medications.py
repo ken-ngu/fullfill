@@ -157,39 +157,40 @@ async def get_medication(
         state=state,
     )
 
-    # Fetch GoodRx price - try cache first, then real-time scraping
+    # Fetch GoodRx price - use cached data only (real-time scraping disabled)
     goodrx_price = goodrx_repo.get_by_medication_id(medication_id)
 
+    # DISABLED: Real-time GoodRx scraping (was causing 403 errors and slowness)
     # Check if we need to fetch fresh data (expired or missing)
-    needs_fetch = goodrx_price is None or (
-        goodrx_price.get("expires_at") and
-        goodrx_price["expires_at"] < datetime.utcnow()
-    )
-
-    if needs_fetch:
-        logger.info(f"Fetching real-time GoodRx data for: {med['generic_name']}")
-        scraper = GoodRxScraperService()
-
-        try:
-            # Fetch real-time price
-            fresh_price = await scraper.fetch_price(
-                medication_name=med["generic_name"],
-                ndc_code=med.get("ndc_codes")[0] if med.get("ndc_codes") else None
-            )
-
-            if fresh_price:
-                # Save to database for future use
-                fresh_price["id"] = f"goodrx-{medication_id}"
-                fresh_price["medication_id"] = medication_id
-                fresh_price["fetched_at"] = datetime.utcnow()
-
-                goodrx_repo.upsert(fresh_price)
-                goodrx_price = fresh_price
-                logger.info(f"Successfully fetched and cached GoodRx price for: {med['generic_name']}")
-            else:
-                logger.warning(f"Failed to fetch GoodRx price for: {med['generic_name']}")
-        except Exception as e:
-            logger.error(f"Error fetching GoodRx price for {med['generic_name']}: {e}")
+    # needs_fetch = goodrx_price is None or (
+    #     goodrx_price.get("expires_at") and
+    #     goodrx_price["expires_at"] < datetime.utcnow()
+    # )
+    #
+    # if needs_fetch:
+    #     logger.info(f"Fetching real-time GoodRx data for: {med['generic_name']}")
+    #     scraper = GoodRxScraperService()
+    #
+    #     try:
+    #         # Fetch real-time price
+    #         fresh_price = await scraper.fetch_price(
+    #             medication_name=med["generic_name"],
+    #             ndc_code=med.get("ndc_codes")[0] if med.get("ndc_codes") else None
+    #         )
+    #
+    #         if fresh_price:
+    #             # Save to database for future use
+    #             fresh_price["id"] = f"goodrx-{medication_id}"
+    #             fresh_price["medication_id"] = medication_id
+    #             fresh_price["fetched_at"] = datetime.utcnow()
+    #
+    #             goodrx_repo.upsert(fresh_price)
+    #             goodrx_price = fresh_price
+    #             logger.info(f"Successfully fetched and cached GoodRx price for: {med['generic_name']}")
+    #         else:
+    #             logger.warning(f"Failed to fetch GoodRx price for: {med['generic_name']}")
+    #     except Exception as e:
+    #         logger.error(f"Error fetching GoodRx price for {med['generic_name']}: {e}")
 
     alternatives = [
         AlternativeSummary(
