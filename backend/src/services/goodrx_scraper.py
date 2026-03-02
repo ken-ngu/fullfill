@@ -23,13 +23,22 @@ Option C (CURRENT IMPLEMENTATION): Web scraping
 - Brittle (breaks when HTML changes)
 """
 
+from __future__ import annotations
 from datetime import datetime, timedelta
 import re
-import httpx
-from bs4 import BeautifulSoup
 import logging
+from typing import Optional
 
 logger = logging.getLogger(__name__)
+
+# Optional imports - only needed if actually using the scraper
+try:
+    import httpx
+    from bs4 import BeautifulSoup
+    SCRAPER_AVAILABLE = True
+except ImportError:
+    SCRAPER_AVAILABLE = False
+    logger.warning("httpx and/or beautifulsoup4 not installed. GoodRx scraper disabled.")
 
 
 class GoodRxScraperService:
@@ -64,6 +73,10 @@ class GoodRxScraperService:
         Returns:
             dict with pricing data, or None if scraping fails
         """
+        if not SCRAPER_AVAILABLE:
+            logger.error("Cannot fetch GoodRx prices: httpx/beautifulsoup4 not installed")
+            return None
+
         try:
             # Normalize medication name for URL (lowercase, replace spaces with hyphens)
             medication_slug = medication_name.lower().strip()
