@@ -1,7 +1,7 @@
 from typing import Optional
 
 from abc import ABC, abstractmethod
-from sqlalchemy import func, String
+from sqlalchemy import func, String, or_, text
 from sqlalchemy.orm import Session
 from src.models.medication import Medication
 
@@ -38,11 +38,15 @@ class PostgresMedicationRepository(AbstractMedicationRepository):
 
     def search(self, q: str, specialty: Optional[str] = None, setting: Optional[str] = None, limit: int = 10) -> list[dict]:
         q_lower = f"%{q.lower()}%"
-        # Search by name, generic name, and brand names (JSON array)
+
+        # Build efficient JSONB array search using jsonb_array_elements_text
+        # Use raw SQL for EXISTS subqueries as SQLAlchemy ORM doesn't handle them elegantly
         query = self._session.query(Medication).filter(
-            Medication.name.ilike(q_lower)
-            | Medication.generic_name.ilike(q_lower)
-            | func.lower(func.cast(Medication.brand_names, String)).ilike(q_lower)
+            or_(
+                Medication.name.ilike(q_lower),
+                Medication.generic_name.ilike(q_lower),
+                text("EXISTS (SELECT 1 FROM jsonb_array_elements_text(brand_names) elem WHERE LOWER(elem) LIKE :q)").bindparams(q=q_lower)
+            )
         )
         if specialty:
             query = query.filter(Medication.specialty == specialty)

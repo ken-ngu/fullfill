@@ -1,7 +1,7 @@
 from typing import Optional
 
 from abc import ABC, abstractmethod
-from sqlalchemy import func, String, or_
+from sqlalchemy import func, String, or_, text
 from sqlalchemy.orm import Session, joinedload
 from src.models.diagnosis import Diagnosis
 
@@ -46,14 +46,13 @@ class PostgresDiagnosisRepository(AbstractDiagnosisRepository):
         """
         q_lower = f"%{q.lower()}%"
 
+        # Build efficient JSONB array search using jsonb_array_elements_text
+        # Use raw SQL for EXISTS subqueries as SQLAlchemy ORM doesn't handle them elegantly
         query = self._session.query(Diagnosis).filter(
             or_(
-                # Search by name
                 Diagnosis.name.ilike(q_lower),
-                # Search in synonyms JSON array
-                func.lower(func.cast(Diagnosis.synonyms, String)).ilike(q_lower),
-                # Search in ICD-10 codes JSON array
-                func.lower(func.cast(Diagnosis.icd10_codes, String)).ilike(q_lower),
+                text("EXISTS (SELECT 1 FROM jsonb_array_elements_text(synonyms) elem WHERE LOWER(elem) LIKE :q)").bindparams(q=q_lower),
+                text("EXISTS (SELECT 1 FROM jsonb_array_elements_text(icd10_codes) elem WHERE LOWER(elem) LIKE :q)").bindparams(q=q_lower),
             )
         )
 
