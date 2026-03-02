@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import type { DiagnosisDetail, PatientContext, DiagnosisMedicationSummary } from "../types";
+import type { DiagnosisDetail, PatientContext } from "../types";
 import { getDiagnosis } from "../api/client";
 import { LoadingSkeleton } from "../components/LoadingSkeleton";
 

@@ -1,4 +1,4 @@
-import type { DiagnosisDetail, DiagnosisMedicationSummary } from "../types";
+import type { DiagnosisDetail } from "../types";
 
 interface Props {
   diagnosis: DiagnosisDetail;

@@ -31,7 +31,7 @@ interface SearchProps {
   onNavigate: (page: string, data?: any) => void;
 }
 
-export function Search({ specialty, setting, onSpecialtyChange, onNavigate }: SearchProps) {
+export function Search({ specialty: _specialty, setting, onSpecialtyChange: _onSpecialtyChange, onNavigate }: SearchProps) {
   const [detail, setDetail] = useState<MedicationDetail | null>(null);
   const [diagnosisDetail, setDiagnosisDetail] = useState<DiagnosisDetail | null>(null);
   const [loading, setLoading] = useState(false);
