@@ -1,4 +1,4 @@
-from __future__ import annotations
+from typing import Optional
 
 import uuid
 from fastapi import APIRouter, Depends
@@ -10,7 +10,7 @@ from src.schemas.event import EventCreate, EventResponse
 router = APIRouter(prefix="/events", tags=["events"])
 
 
-def _age_group(age: int | None) -> str | None:
+def _age_group(age: Optional[int]) -> Optional[str]:
     if age is None:
         return None
     if age < 18:

@@ -3,7 +3,6 @@ Pydantic schemas for 340B replenishment orders.
 
 These schemas define the API request/response models for the admin dashboard.
 """
-from __future__ import annotations
 
 from pydantic import BaseModel, Field
 from typing import Optional

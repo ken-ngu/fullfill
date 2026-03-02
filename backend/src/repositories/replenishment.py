@@ -3,7 +3,7 @@ Repository for replenishment order data access.
 
 Handles CRUD operations for 340B replenishment orders.
 """
-from __future__ import annotations
+from typing import Optional
 
 from abc import ABC, abstractmethod
 from datetime import date, datetime
@@ -34,7 +34,7 @@ class AbstractReplenishmentRepository(ABC):
         pass
 
     @abstractmethod
-    def get_order_by_id(self, order_id: str) -> dict | None:
+    def get_order_by_id(self, order_id: str) -> Optional[dict]:
         """Get single order with all details including line items."""
         pass
 
@@ -49,23 +49,23 @@ class AbstractReplenishmentRepository(ABC):
         order_id: str,
         line_items: list[dict],
         user_id: str,
-        admin_notes: str | None = None
-    ) -> dict | None:
+        admin_notes: Optional[str] = None
+    ) -> Optional[dict]:
         """Update line items for an order."""
         pass
 
     @abstractmethod
-    def approve_order(self, order_id: str, user_id: str, admin_notes: str | None = None) -> dict | None:
+    def approve_order(self, order_id: str, user_id: str, admin_notes: Optional[str] = None) -> Optional[dict]:
         """Approve an order for submission."""
         pass
 
     @abstractmethod
-    def submit_order(self, order_id: str) -> dict | None:
+    def submit_order(self, order_id: str) -> Optional[dict]:
         """Mark an order as submitted to vendor."""
         pass
 
     @abstractmethod
-    def cancel_order(self, order_id: str, reason: str) -> dict | None:
+    def cancel_order(self, order_id: str, reason: str) -> Optional[dict]:
         """Cancel an order."""
         pass
 
@@ -127,7 +127,7 @@ class PostgresReplenishmentRepository(AbstractReplenishmentRepository):
         )
         return [_to_dict(o) for o in orders]
 
-    def get_order_by_id(self, order_id: str) -> dict | None:
+    def get_order_by_id(self, order_id: str) -> Optional[dict]:
         """Get single order with all details including line items."""
         order = (
             self._session.query(ReplenishmentOrder)
@@ -150,8 +150,8 @@ class PostgresReplenishmentRepository(AbstractReplenishmentRepository):
         order_id: str,
         line_items: list[dict],
         user_id: str,
-        admin_notes: str | None = None
-    ) -> dict | None:
+        admin_notes: Optional[str] = None
+    ) -> Optional[dict]:
         """
         Update line items for an order.
 
@@ -197,7 +197,7 @@ class PostgresReplenishmentRepository(AbstractReplenishmentRepository):
         logger.info(f"Updated line items for order {order_id} by user {user_id}")
         return _to_dict(order)
 
-    def approve_order(self, order_id: str, user_id: str, admin_notes: str | None = None) -> dict | None:
+    def approve_order(self, order_id: str, user_id: str, admin_notes: Optional[str] = None) -> Optional[dict]:
         """Approve an order for submission."""
         order = (
             self._session.query(ReplenishmentOrder)
@@ -233,7 +233,7 @@ class PostgresReplenishmentRepository(AbstractReplenishmentRepository):
         logger.info(f"Approved order {order_id} by user {user_id}")
         return _to_dict(order)
 
-    def submit_order(self, order_id: str) -> dict | None:
+    def submit_order(self, order_id: str) -> Optional[dict]:
         """Mark an order as submitted to vendor."""
         order = (
             self._session.query(ReplenishmentOrder)
@@ -262,7 +262,7 @@ class PostgresReplenishmentRepository(AbstractReplenishmentRepository):
         logger.info(f"Submitted order {order_id}")
         return _to_dict(order)
 
-    def cancel_order(self, order_id: str, reason: str) -> dict | None:
+    def cancel_order(self, order_id: str, reason: str) -> Optional[dict]:
         """Cancel an order."""
         order = (
             self._session.query(ReplenishmentOrder)

@@ -1,7 +1,6 @@
 """
 User model with multi-tenant support and role-based access control.
 """
-from __future__ import annotations
 
 from sqlalchemy import Column, String, Boolean, DateTime, ForeignKey
 from sqlalchemy.orm import relationship

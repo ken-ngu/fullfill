@@ -6,7 +6,6 @@ This service handles the business logic for:
 - Calculating par levels and reorder quantities
 - Verifying 340B contract coverage
 """
-from __future__ import annotations
 
 from datetime import date, datetime, timedelta
 from typing import Optional

@@ -4,7 +4,6 @@ DispensingRecord model tracking medications dispensed from hospital pharmacy.
 Each record represents a single dispensing event and is used to calculate
 daily replenishment quantities for 340B orders.
 """
-from __future__ import annotations
 
 from sqlalchemy import Column, String, Integer, DateTime, Date, Boolean, Float, ForeignKey
 from sqlalchemy.orm import relationship

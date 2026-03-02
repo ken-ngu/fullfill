@@ -4,7 +4,6 @@ Diagnosis seed data for FullFill.
 50+ common diagnoses with ICD-10 codes, descriptions, and medication mappings.
 """
 
-from __future__ import annotations
 
 DIAGNOSES: list[dict] = [
     # ─── DERMATOLOGIC CONDITIONS ─────────────────────────────────────────────

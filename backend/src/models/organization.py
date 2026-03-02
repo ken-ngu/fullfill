@@ -3,7 +3,6 @@ Organization/Hospital model for multi-tenant 340B support.
 
 Each organization represents a hospital, clinic, or pharmacy that uses the 340B program.
 """
-from __future__ import annotations
 
 from sqlalchemy import Column, String, JSON, Boolean, DateTime
 from sqlalchemy.orm import relationship

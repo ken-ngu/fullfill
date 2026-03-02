@@ -1,4 +1,4 @@
-from __future__ import annotations
+from typing import Optional
 
 """
 Fill risk scoring engine.
@@ -74,14 +74,14 @@ _PLAIN_LANGUAGE = {
 def calculate_fill_risk(
     medication: dict,
     specialty: str = "dermatology",
-    rtpb_data: dict | None = None,
+    rtpb_data: Optional[dict] = None,
 ) -> FillRiskResult:
     """
     Parameters
     ----------
     medication : dict   Medication fields
     specialty  : str    Used to select weights
-    rtpb_data  : dict | None  If present, adjusts score based on live benefit data
+    rtpb_data  : Optional[dict]  If present, adjusts score based on live benefit data
 
     Returns
     -------

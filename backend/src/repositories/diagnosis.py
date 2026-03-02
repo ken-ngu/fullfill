@@ -1,4 +1,4 @@
-from __future__ import annotations
+from typing import Optional
 
 from abc import ABC, abstractmethod
 from sqlalchemy import func, String, or_
@@ -13,12 +13,12 @@ class AbstractDiagnosisRepository(ABC):
         pass
 
     @abstractmethod
-    def get_by_id(self, diagnosis_id: str) -> dict | None:
+    def get_by_id(self, diagnosis_id: str) -> Optional[dict]:
         """Get single diagnosis by ID"""
         pass
 
     @abstractmethod
-    def get_medications_for_diagnosis(self, diagnosis_id: str) -> dict | None:
+    def get_medications_for_diagnosis(self, diagnosis_id: str) -> Optional[dict]:
         """Get diagnosis with all associated medications (with joinedload)"""
         pass
 
@@ -60,7 +60,7 @@ class PostgresDiagnosisRepository(AbstractDiagnosisRepository):
         results = query.limit(limit).all()
         return [_to_dict(d) for d in results]
 
-    def get_by_id(self, diagnosis_id: str) -> dict | None:
+    def get_by_id(self, diagnosis_id: str) -> Optional[dict]:
         """Get single diagnosis by ID without medications"""
         diagnosis = self._session.query(Diagnosis).filter(
             Diagnosis.id == diagnosis_id
@@ -68,7 +68,7 @@ class PostgresDiagnosisRepository(AbstractDiagnosisRepository):
 
         return _to_dict(diagnosis) if diagnosis else None
 
-    def get_medications_for_diagnosis(self, diagnosis_id: str) -> dict | None:
+    def get_medications_for_diagnosis(self, diagnosis_id: str) -> Optional[dict]:
         """
         Get diagnosis with all associated medications eagerly loaded.
         This is used for the diagnosis detail page to show all treatment options.

@@ -1,3 +1,4 @@
+from typing import Optional
 from pydantic import BaseModel
 from src.schemas.medication import CostEstimate
 
@@ -28,7 +29,7 @@ class DiagnosisDetail(BaseModel):
     id: str
     name: str
     icd10_codes: list[str]
-    description: str | None = None
+    description: Optional[str] = None
     category: str
     synonyms: list[str] = []
     medications: list[DiagnosisMedicationSummary]

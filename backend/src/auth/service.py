@@ -1,4 +1,3 @@
-from __future__ import annotations
 
 """
 Simple JWT auth service.
@@ -7,6 +6,7 @@ No patient PHI is ever stored or transmitted through auth.
 """
 
 from datetime import datetime, timedelta, timezone
+from typing import Optional
 from jose import JWTError, jwt
 from src.config import settings
 
@@ -44,7 +44,7 @@ def create_token(clinic_code: str) -> str:
     return jwt.encode(payload, settings.jwt_secret, algorithm=_ALGORITHM)
 
 
-def verify_token(token: str) -> str | None:
+def verify_token(token: str) -> Optional[str]:
     """Returns clinic_code if valid, None if invalid/expired."""
     try:
         payload = jwt.decode(token, settings.jwt_secret, algorithms=[_ALGORITHM])
@@ -53,7 +53,7 @@ def verify_token(token: str) -> str | None:
         return None
 
 
-def verify_token_payload(token: str) -> dict | None:
+def verify_token_payload(token: str) -> Optional[dict]:
     """Returns full decoded payload if valid, None if invalid/expired."""
     try:
         return jwt.decode(token, settings.jwt_secret, algorithms=[_ALGORITHM])

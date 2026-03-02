@@ -10,7 +10,6 @@ For production, consider:
 - Option C: Web scraping (not recommended due to ToS concerns)
 """
 
-from __future__ import annotations
 from datetime import datetime, timedelta
 
 # GoodRx prices expire after 90 days for static data

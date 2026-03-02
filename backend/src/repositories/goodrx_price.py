@@ -1,4 +1,4 @@
-from __future__ import annotations
+from typing import Optional
 
 from abc import ABC, abstractmethod
 from datetime import datetime
@@ -8,7 +8,7 @@ from src.models.goodrx_price import GoodRxPrice
 
 class AbstractGoodRxPriceRepository(ABC):
     @abstractmethod
-    def get_by_medication_id(self, medication_id: str) -> dict | None:
+    def get_by_medication_id(self, medication_id: str) -> Optional[dict]:
         """Fetch cached GoodRx price for a medication (only if not expired)"""
         pass
 
@@ -27,7 +27,7 @@ class PostgresGoodRxPriceRepository(AbstractGoodRxPriceRepository):
     def __init__(self, session: Session):
         self._session = session
 
-    def get_by_medication_id(self, medication_id: str) -> dict | None:
+    def get_by_medication_id(self, medication_id: str) -> Optional[dict]:
         """
         Fetch cached GoodRx price for a medication.
         Only returns prices that haven't expired.
@@ -52,10 +52,10 @@ class PostgresGoodRxPriceRepository(AbstractGoodRxPriceRepository):
         - medication_id: str
         - cash_price_low_usd: float
         - cash_price_high_usd: float
-        - coupon_price_usd: float | None
-        - zip_code: str | None
-        - pharmacy_type: str | None
-        - source_url: str | None
+        - coupon_price_usd: Optional[float]
+        - zip_code: Optional[str]
+        - pharmacy_type: Optional[str]
+        - source_url: Optional[str]
         - expires_at: datetime
         """
         # Check if price already exists

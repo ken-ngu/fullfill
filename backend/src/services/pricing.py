@@ -5,8 +5,7 @@ Calculates patient-specific out-of-pocket costs based on insurance type,
 deductible status, and medication characteristics.
 """
 
-from __future__ import annotations
-from typing import Tuple
+from typing import Optional, Tuple
 
 # State-specific Medicaid copay ranges (low, high) in USD
 # Based on state Medicaid formulary policies as of 2026
@@ -68,10 +67,10 @@ MEDICAID_COPAYS_BY_STATE = {
 def calculate_patient_cost(
     medication: dict,
     insurance_type: str = "commercial",
-    age: int | None = None,
+    age: Optional[int] = None,
     deductible_met: bool = False,
-    plan_type: str | None = None,
-    state: str | None = None,
+    plan_type: Optional[str] = None,
+    state: Optional[str] = None,
 ) -> Tuple[float, float, str]:
     """
     Calculate patient out-of-pocket cost range based on insurance context.
@@ -82,13 +81,13 @@ def calculate_patient_cost(
         Medication with cost_low_usd, cost_high_usd, formulary_tier, brand_only
     insurance_type : str
         "commercial" | "medicare" | "medicaid" | "cash"
-    age : int | None
+    age : Optional[int]
         Patient age (used to infer Medicare eligibility)
     deductible_met : bool
         Whether annual deductible has been met
-    plan_type : str | None
+    plan_type : Optional[str]
         "PPO" | "HMO" | "HSA" - affects commercial insurance pricing (40-50% accuracy improvement)
-    state : str | None
+    state : Optional[str]
         Two-letter state code - affects Medicaid copays (30-40% accuracy improvement)
 
     Returns
@@ -225,7 +224,7 @@ def get_price_type_label(price_type: str) -> str:
     return labels.get(price_type, "Estimated range")
 
 
-def get_copay_card_note(medication: dict, insurance_type: str) -> str | None:
+def get_copay_card_note(medication: dict, insurance_type: str) -> Optional[str]:
     """
     Check if medication may be eligible for manufacturer copay card.
 
@@ -241,7 +240,7 @@ def get_copay_card_note(medication: dict, insurance_type: str) -> str | None:
 
     Returns
     -------
-    str | None
+    Optional[str]
         Note about copay card availability, or None
     """
     if insurance_type != "commercial":

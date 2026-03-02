@@ -4,7 +4,6 @@ Contract340B model representing 340B pricing contracts with pharmaceutical vendo
 Each contract links a hospital organization to a vendor (e.g., Cardinal Health, McKesson)
 and defines the medications covered under 340B pricing.
 """
-from __future__ import annotations
 
 from sqlalchemy import Column, String, Date, Boolean, JSON, Float, ForeignKey
 from sqlalchemy.orm import relationship

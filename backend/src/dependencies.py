@@ -1,4 +1,3 @@
-from __future__ import annotations
 
 from fastapi import Depends, HTTPException, Header
 from typing import Optional

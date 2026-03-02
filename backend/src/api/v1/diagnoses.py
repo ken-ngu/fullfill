@@ -1,4 +1,4 @@
-from __future__ import annotations
+from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from src.dependencies import get_diagnosis_repo, get_medication_repo
@@ -11,7 +11,7 @@ from src.services.pricing import calculate_patient_cost, get_price_type_label, g
 router = APIRouter(prefix="/diagnoses", tags=["diagnoses"])
 
 
-def _cost_estimate(med: dict, ctx: PatientContext | None = None) -> CostEstimate:
+def _cost_estimate(med: dict, ctx: Optional[PatientContext] = None) -> CostEstimate:
     """Calculate cost estimate for a medication (same logic as medications endpoint)"""
     if ctx is None:
         # Default patient context - show generic pricing
@@ -74,10 +74,10 @@ def search_diagnoses(
 def get_diagnosis(
     diagnosis_id: str,
     insurance_type: str = Query("commercial"),
-    age: int | None = Query(None, ge=0, le=120),
+    age: Optional[int] = Query(None, ge=0, le=120),
     deductible_met: bool = Query(False),
-    plan_type: str | None = Query(None),
-    state: str | None = Query(None),
+    plan_type: Optional[str] = Query(None),
+    state: Optional[str] = Query(None),
     diagnosis_repo: AbstractDiagnosisRepository = Depends(get_diagnosis_repo),
     medication_repo: AbstractMedicationRepository = Depends(get_medication_repo),
 ) -> DiagnosisDetail:

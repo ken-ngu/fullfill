@@ -5,7 +5,6 @@ Each order represents a daily replenishment request from a hospital pharmacy,
 containing line items calculated from dispensing records. Orders go through
 a review workflow before being submitted to vendors.
 """
-from __future__ import annotations
 
 from sqlalchemy import Column, String, Date, DateTime, JSON, Integer, Float, ForeignKey, Enum as SQLEnum
 from sqlalchemy.orm import relationship

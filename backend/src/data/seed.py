@@ -6,7 +6,7 @@ Confidence scores assigned by clinical pharmacy researcher review.
 Run: python -m src.data.seed
 """
 
-from __future__ import annotations
+from typing import Optional
 
 import sys
 import os
@@ -3126,7 +3126,7 @@ def seed_goodrx_prices(session: Session) -> None:
         print("✓ All GoodRx prices already seeded.")
 
 
-def run_seed(database_url: str | None = None) -> None:
+def run_seed(database_url: Optional[str] = None) -> None:
     url = database_url or settings.database_url
     engine = create_engine(url)
     Base.metadata.create_all(engine)

@@ -23,7 +23,6 @@ Option C (CURRENT IMPLEMENTATION): Web scraping
 - Brittle (breaks when HTML changes)
 """
 
-from __future__ import annotations
 from datetime import datetime, timedelta
 import re
 import logging
@@ -59,9 +58,9 @@ class GoodRxScraperService:
     async def fetch_price(
         self,
         medication_name: str,
-        ndc_code: str | None = None,
+        ndc_code: Optional[str] = None,
         zip_code: str = "90210"
-    ) -> dict | None:
+    ) -> Optional[dict]:
         """
         Fetch GoodRx price for a medication by scraping their website.
 
@@ -124,7 +123,7 @@ class GoodRxScraperService:
             logger.error(f"Error scraping GoodRx for {medication_name}: {e}")
             return None
 
-    def _extract_prices_from_html(self, soup: BeautifulSoup) -> dict | None:
+    def _extract_prices_from_html(self, soup: "BeautifulSoup") -> Optional[dict]:
         """
         Extract price data from GoodRx HTML.
 

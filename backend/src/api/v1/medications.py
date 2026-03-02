@@ -1,4 +1,4 @@
-from __future__ import annotations
+from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import joinedload
@@ -29,8 +29,8 @@ router = APIRouter(prefix="/medications", tags=["medications"])
 
 def _cost_estimate(
     med: dict,
-    ctx: PatientContext | None = None,
-    goodrx_data: dict | None = None,
+    ctx: Optional[PatientContext] = None,
+    goodrx_data: Optional[dict] = None,
 ) -> CostEstimate:
     if ctx is None:
         # Default patient context - show generic pricing
@@ -107,8 +107,8 @@ def _to_summary(m: dict) -> MedicationSummary:
 
 @router.get("/top", response_model=list[MedicationSummary])
 def top_medications(
-    specialty: str | None = Query(None),
-    setting: str | None = Query(None),
+    specialty: Optional[str] = Query(None),
+    setting: Optional[str] = Query(None),
     limit: int = Query(6, ge=1, le=20),
     repo: AbstractMedicationRepository = Depends(get_medication_repo),
 ) -> list[MedicationSummary]:
@@ -118,8 +118,8 @@ def top_medications(
 @router.get("/search", response_model=list[MedicationSummary])
 def search_medications(
     q: str = Query(..., min_length=2, max_length=100),
-    specialty: str | None = Query(None),
-    setting: str | None = Query(None),
+    specialty: Optional[str] = Query(None),
+    setting: Optional[str] = Query(None),
     limit: int = Query(10, ge=1, le=50),
     repo: AbstractMedicationRepository = Depends(get_medication_repo),
 ) -> list[MedicationSummary]:
@@ -130,11 +130,11 @@ def search_medications(
 async def get_medication(
     medication_id: str,
     insurance_type: str = Query("commercial"),
-    age: int | None = Query(None, ge=0, le=120),
+    age: Optional[int] = Query(None, ge=0, le=120),
     deductible_met: bool = Query(False),
-    plan_type: str | None = Query(None),
-    state: str | None = Query(None),
-    specialty: str | None = Query(None),
+    plan_type: Optional[str] = Query(None),
+    state: Optional[str] = Query(None),
+    specialty: Optional[str] = Query(None),
     repo: AbstractMedicationRepository = Depends(get_medication_repo),
     goodrx_repo: AbstractGoodRxPriceRepository = Depends(get_goodrx_price_repo),
 ) -> MedicationDetail:

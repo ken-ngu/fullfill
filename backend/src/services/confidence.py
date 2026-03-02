@@ -1,4 +1,4 @@
-from __future__ import annotations
+from typing import Optional
 
 """
 Confidence score (0–100) for cost estimate reliability.
@@ -29,12 +29,12 @@ _OTC_BONUS = 15
 _RTPB_BONUS = 25            # live adjudicated data
 
 
-def calculate_confidence(medication: dict, rtpb_data: dict | None = None) -> int:
+def calculate_confidence(medication: dict, rtpb_data: Optional[dict] = None) -> int:
     """
     Parameters
     ----------
     medication : dict  Keys from Medication model (SQLAlchemy row as dict or seed dict)
-    rtpb_data  : dict | None  Real-time pharmacy benefit response (v2); None = v1 behaviour
+    rtpb_data  : Optional[dict]  Real-time pharmacy benefit response (v2); None = v1 behaviour
 
     Returns
     -------
