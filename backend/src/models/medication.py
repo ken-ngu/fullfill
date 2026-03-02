@@ -1,5 +1,5 @@
 from sqlalchemy import Column, String, Float, Boolean, Integer, Date, JSON
-from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy.orm import DeclarativeBase, relationship
 
 
 class Base(DeclarativeBase):
@@ -60,3 +60,10 @@ class Medication(Base):
     # Metadata
     data_source = Column(String, nullable=False, default="public-data")
     last_updated = Column(Date, nullable=True)
+
+    # Relationships
+    diagnoses = relationship(
+        "Diagnosis",
+        secondary="medication_diagnoses",
+        back_populates="medications"
+    )

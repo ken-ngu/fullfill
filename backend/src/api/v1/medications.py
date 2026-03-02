@@ -1,25 +1,37 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends, HTTPException, Query
-from src.dependencies import get_medication_repo
+from sqlalchemy.orm import joinedload
+from src.dependencies import get_medication_repo, get_goodrx_price_repo
 from src.repositories.medication import AbstractMedicationRepository
+from src.repositories.goodrx_price import AbstractGoodRxPriceRepository
 from src.services.fill_risk import calculate_fill_risk
 from src.services.alternatives import find_alternatives, build_switch_note
 from src.services.confidence import calculate_confidence
 from src.services.pricing import calculate_patient_cost, get_price_type_label, get_copay_card_note
+from src.services.goodrx_scraper import GoodRxScraperService
 from src.schemas.medication import (
     MedicationSummary,
     MedicationDetail,
     CostEstimate,
+    GoodRxPrice,
     PAStatus,
     AlternativeSummary,
     PatientContext,
 )
+from datetime import datetime
+import logging
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/medications", tags=["medications"])
 
 
-def _cost_estimate(med: dict, ctx: PatientContext | None = None) -> CostEstimate:
+def _cost_estimate(
+    med: dict,
+    ctx: PatientContext | None = None,
+    goodrx_data: dict | None = None,
+) -> CostEstimate:
     if ctx is None:
         # Default patient context - show generic pricing
         low_usd = med["cost_low_usd"]
@@ -42,12 +54,23 @@ def _cost_estimate(med: dict, ctx: PatientContext | None = None) -> CostEstimate
         if copay_note:
             label = f"{label} (copay card may apply)"
 
+    # Add GoodRx price if available
+    goodrx_price = None
+    if goodrx_data:
+        goodrx_price = GoodRxPrice(
+            cash_price_low_usd=goodrx_data["cash_price_low_usd"],
+            cash_price_high_usd=goodrx_data["cash_price_high_usd"],
+            coupon_price_usd=goodrx_data.get("coupon_price_usd"),
+            last_updated=goodrx_data.get("fetched_at"),
+        )
+
     return CostEstimate(
         low_usd=low_usd,
         high_usd=high_usd,
         cost_basis=med["cost_basis"],
         label=label,
         data_source=med["data_source"],
+        goodrx_price=goodrx_price,
     )
 
 
@@ -62,10 +85,6 @@ def _pa_status(med: dict) -> PAStatus:
         step_therapy_required=med["step_therapy_required"],
         step_therapy_agents=med.get("step_therapy_agents") or [],
     )
-
-
-def _resolve_specialty(explicit: str | None, default: str = "dermatology") -> str:
-    return explicit if explicit is not None else default
 
 
 def _to_summary(m: dict) -> MedicationSummary:
@@ -93,8 +112,7 @@ def top_medications(
     limit: int = Query(6, ge=1, le=20),
     repo: AbstractMedicationRepository = Depends(get_medication_repo),
 ) -> list[MedicationSummary]:
-    resolved = _resolve_specialty(specialty)
-    return [_to_summary(m) for m in repo.get_top(specialty=resolved, limit=limit, setting=setting)]
+    return [_to_summary(m) for m in repo.get_top(specialty=specialty, limit=limit, setting=setting)]
 
 
 @router.get("/search", response_model=list[MedicationSummary])
@@ -105,12 +123,11 @@ def search_medications(
     limit: int = Query(10, ge=1, le=50),
     repo: AbstractMedicationRepository = Depends(get_medication_repo),
 ) -> list[MedicationSummary]:
-    resolved = _resolve_specialty(specialty)
-    return [_to_summary(m) for m in repo.search(q=q, specialty=resolved, limit=limit, setting=setting)]
+    return [_to_summary(m) for m in repo.search(q=q, specialty=specialty, limit=limit, setting=setting)]
 
 
 @router.get("/{medication_id}", response_model=MedicationDetail)
-def get_medication(
+async def get_medication(
     medication_id: str,
     insurance_type: str = Query("commercial"),
     age: int | None = Query(None, ge=0, le=120),
@@ -119,9 +136,8 @@ def get_medication(
     state: str | None = Query(None),
     specialty: str | None = Query(None),
     repo: AbstractMedicationRepository = Depends(get_medication_repo),
+    goodrx_repo: AbstractGoodRxPriceRepository = Depends(get_goodrx_price_repo),
 ) -> MedicationDetail:
-    resolved_specialty = _resolve_specialty(specialty)
-
     med = repo.get_by_id(medication_id)
     if med is None:
         raise HTTPException(status_code=404, detail="Medication not found")
@@ -129,7 +145,7 @@ def get_medication(
     all_meds = repo.get_all(specialty=med["specialty"])
     alt_meds = find_alternatives(med, all_meds)
 
-    fill_risk = calculate_fill_risk(med, specialty=resolved_specialty)
+    fill_risk = calculate_fill_risk(med, specialty=specialty or med["specialty"])
     confidence = calculate_confidence(med)
 
     # Create patient context for pricing
@@ -141,6 +157,40 @@ def get_medication(
         state=state,
     )
 
+    # Fetch GoodRx price - try cache first, then real-time scraping
+    goodrx_price = goodrx_repo.get_by_medication_id(medication_id)
+
+    # Check if we need to fetch fresh data (expired or missing)
+    needs_fetch = goodrx_price is None or (
+        goodrx_price.get("expires_at") and
+        goodrx_price["expires_at"] < datetime.utcnow()
+    )
+
+    if needs_fetch:
+        logger.info(f"Fetching real-time GoodRx data for: {med['generic_name']}")
+        scraper = GoodRxScraperService()
+
+        try:
+            # Fetch real-time price
+            fresh_price = await scraper.fetch_price(
+                medication_name=med["generic_name"],
+                ndc_code=med.get("ndc_codes")[0] if med.get("ndc_codes") else None
+            )
+
+            if fresh_price:
+                # Save to database for future use
+                fresh_price["id"] = f"goodrx-{medication_id}"
+                fresh_price["medication_id"] = medication_id
+                fresh_price["fetched_at"] = datetime.utcnow()
+
+                goodrx_repo.upsert(fresh_price)
+                goodrx_price = fresh_price
+                logger.info(f"Successfully fetched and cached GoodRx price for: {med['generic_name']}")
+            else:
+                logger.warning(f"Failed to fetch GoodRx price for: {med['generic_name']}")
+        except Exception as e:
+            logger.error(f"Error fetching GoodRx price for {med['generic_name']}: {e}")
+
     alternatives = [
         AlternativeSummary(
             id=a["id"],
@@ -148,12 +198,17 @@ def get_medication(
             generic_name=a["generic_name"],
             brand_names=a.get("brand_names") or [],
             cost_estimate=_cost_estimate(a, patient_ctx),
-            fill_risk_level=calculate_fill_risk(a, specialty=resolved_specialty).level,
+            fill_risk_level=calculate_fill_risk(a, specialty=specialty or a["specialty"]).level,
             confidence_score=calculate_confidence(a),
             switch_note=build_switch_note(a, med),
         )
         for a in alt_meds
     ]
+
+    # Get diagnosis IDs for this medication
+    # Note: This requires the medication model to be queried with joinedload
+    # For now, return empty list until we update the repository to support this
+    diagnoses_ids = med.get("diagnoses", [])
 
     return MedicationDetail(
         id=med["id"],
@@ -174,11 +229,12 @@ def get_medication(
         step_therapy_required=med["step_therapy_required"],
         ndc_codes=med.get("ndc_codes") or [],
         confidence_score=confidence,
-        cost_estimate=_cost_estimate(med, patient_ctx),
+        cost_estimate=_cost_estimate(med, patient_ctx, goodrx_price),
         fill_risk_level=fill_risk.level,
         fill_risk_score=int(fill_risk.score),
         fill_risk_reasons=fill_risk.reasons,
         fill_risk_plain_language=fill_risk.plain_language,
         pa_status=_pa_status(med),
         alternatives=alternatives,
+        diagnoses=diagnoses_ids,
     )

@@ -1,5 +1,14 @@
 from pydantic import BaseModel
 from typing import Optional
+from datetime import datetime
+
+
+class GoodRxPrice(BaseModel):
+    """GoodRx cash pricing information"""
+    cash_price_low_usd: float
+    cash_price_high_usd: float
+    coupon_price_usd: Optional[float] = None
+    last_updated: Optional[datetime] = None
 
 
 class CostEstimate(BaseModel):
@@ -12,6 +21,7 @@ class CostEstimate(BaseModel):
         "Manufacturer copay assistance may apply for commercially insured patients."
     )
     data_source: str
+    goodrx_price: Optional[GoodRxPrice] = None  # GoodRx cash price comparison
 
 
 class PAStatus(BaseModel):
@@ -73,3 +83,4 @@ class MedicationDetail(MedicationSummary):
     fill_risk_plain_language: str
     pa_status: PAStatus
     alternatives: list[AlternativeSummary]
+    diagnoses: list[str] = []  # List of diagnosis IDs this medication treats

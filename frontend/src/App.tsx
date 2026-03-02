@@ -4,16 +4,29 @@ import { About } from "./pages/About";
 import { DataSources } from "./pages/DataSources";
 import { Auth } from "./pages/Auth";
 import { Search } from "./pages/Search";
+import { DiagnosisDetail } from "./pages/DiagnosisDetail";
+import Admin340B from "./pages/Admin340B";
+import { OrderReview340B } from "./pages/OrderReview340B";
+import type { PatientContext } from "./types";
 
-type Page = "home" | "about" | "data-sources" | "login" | "search";
+type Page = "home" | "about" | "data-sources" | "login" | "search" | "diagnosis" | "admin340b" | "order-review";
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState<Page>("home");
+  const [currentDiagnosisId, setCurrentDiagnosisId] = useState<string | null>(null);
+  const [currentOrderId, setCurrentOrderId] = useState<string | null>(null);
   const [specialty, setSpecialty] = useState<string>(() => {
     return localStorage.getItem("fullfill_specialty") || "dermatology";
   });
   const [setting, setSetting] = useState<string>(() => {
     return localStorage.getItem("fullfill_setting") || "outpatient";
+  });
+  const [patientContext] = useState<PatientContext>({
+    insurance_type: "commercial",
+    age: null,
+    deductible_met: false,
+    plan_type: "PPO",
+    state: null,
   });
 
   useEffect(() => {
@@ -24,8 +37,23 @@ export default function App() {
     }
   }, []);
 
-  function handleNavigate(page: string) {
+  function handleNavigate(page: string, data?: any) {
     setCurrentPage(page as Page);
+
+    // Handle diagnosis navigation with data
+    if (page === "diagnosis" && data?.diagnosisId) {
+      setCurrentDiagnosisId(data.diagnosisId);
+    } else if (page === "search") {
+      setCurrentDiagnosisId(null);
+    }
+
+    // Handle order review navigation with data
+    if (page === "order-review" && data?.orderId) {
+      setCurrentOrderId(data.orderId);
+    } else if (page === "admin340b") {
+      setCurrentOrderId(null);
+    }
+
     // Instant scroll to top to prevent white screen on mobile
     window.scrollTo(0, 0);
   }
@@ -60,6 +88,24 @@ export default function App() {
 
   if (currentPage === "login") {
     return <Auth onNavigate={handleNavigate} onAuth={handleAuth} />;
+  }
+
+  if (currentPage === "diagnosis" && currentDiagnosisId) {
+    return (
+      <DiagnosisDetail
+        diagnosisId={currentDiagnosisId}
+        patientContext={patientContext}
+        onNavigateToMedication={() => handleNavigate("search")}
+      />
+    );
+  }
+
+  if (currentPage === "admin340b") {
+    return <Admin340B onNavigate={handleNavigate} />;
+  }
+
+  if (currentPage === "order-review" && currentOrderId) {
+    return <OrderReview340B orderId={currentOrderId} onNavigate={handleNavigate} />;
   }
 
   return (

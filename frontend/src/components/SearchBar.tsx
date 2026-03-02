@@ -1,17 +1,19 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
-import type { MedicationSummary } from "../types";
-import { searchMedications, getTopMedications } from "../api/client";
+import type { MedicationSummary, DiagnosisSummary } from "../types";
+import { unifiedSearch, getTopMedications } from "../api/client";
 
 interface Props {
   onSelect: (med: MedicationSummary) => void;
+  onSelectDiagnosis: (diagnosis: DiagnosisSummary) => void;
   specialty?: string;
   setting?: string;
 }
 
-export function SearchBar({ onSelect, specialty, setting }: Props) {
+export function SearchBar({ onSelect, onSelectDiagnosis, specialty, setting }: Props) {
   const [query, setQuery] = useState("");
-  const [suggestions, setSuggestions] = useState<MedicationSummary[]>([]);
+  const [medicationResults, setMedicationResults] = useState<MedicationSummary[]>([]);
+  const [diagnosisResults, setDiagnosisResults] = useState<DiagnosisSummary[]>([]);
   const [topMeds, setTopMeds] = useState<MedicationSummary[]>([]);
   const [loading, setLoading] = useState(false);
   const [focused, setFocused] = useState(false);
@@ -33,41 +35,57 @@ export function SearchBar({ onSelect, specialty, setting }: Props) {
     getTopMedications(specialty, setting).then(setTopMeds).catch(() => {});
   }, [specialty, setting]);
 
-  // Debounced search — 100ms for snappier response
+  // Debounced unified search (medications + diagnoses) — 100ms for snappier response
   useEffect(() => {
     if (query.length < 1) {
-      setSuggestions([]);
+      setMedicationResults([]);
+      setDiagnosisResults([]);
       return;
     }
     setLoading(true);
     const timer = setTimeout(async () => {
       try {
-        const results = await searchMedications(query, specialty, setting);
-        setSuggestions(results);
+        const results = await unifiedSearch(query, specialty);
+        setMedicationResults(results.medications);
+        setDiagnosisResults(results.diagnoses);
       } catch {
-        setSuggestions([]);
+        setMedicationResults([]);
+        setDiagnosisResults([]);
       } finally {
         setLoading(false);
       }
     }, 100);
     return () => clearTimeout(timer);
-  }, [query, specialty, setting]);
+  }, [query, specialty]);
 
-  const visibleItems = query.length >= 1 ? suggestions : topMeds;
+  const showingSearch = query.length >= 1;
   const showingTop = query.length < 1;
+  const hasResults = showingSearch
+    ? medicationResults.length > 0 || diagnosisResults.length > 0
+    : topMeds.length > 0;
   // Dropdown is open whenever the input is focused AND there's something to show
-  const open = focused && visibleItems.length > 0;
+  const open = focused && hasResults;
 
-  function handleSelect(med: MedicationSummary) {
+  function handleSelectMedication(med: MedicationSummary) {
     setQuery(med.name);
     setFocused(false);
-    setSuggestions([]);
+    setMedicationResults([]);
+    setDiagnosisResults([]);
     onSelect(med);
+  }
+
+  function handleSelectDiagnosis(diagnosis: DiagnosisSummary) {
+    setQuery(diagnosis.name);
+    setFocused(false);
+    setMedicationResults([]);
+    setDiagnosisResults([]);
+    onSelectDiagnosis(diagnosis);
   }
 
   function handleClear() {
     setQuery("");
-    setSuggestions([]);
+    setMedicationResults([]);
+    setDiagnosisResults([]);
     inputRef.current?.focus();
   }
 
@@ -82,7 +100,7 @@ export function SearchBar({ onSelect, specialty, setting }: Props) {
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => { setFocused(true); updateDropdownPos(); }}
           onBlur={() => setTimeout(() => setFocused(false), 150)}
-          placeholder="Search medications"
+          placeholder="Search medications or conditions"
           className="flex-1 px-4 py-4 text-base text-slate-900 placeholder-slate-400 outline-none bg-transparent font-light"
           autoComplete="off"
           autoCorrect="off"
@@ -118,43 +136,109 @@ export function SearchBar({ onSelect, specialty, setting }: Props) {
             width: dropdownPos.width,
             zIndex: 9999,
           }}
-          className="bg-white/95 backdrop-blur-xl border border-slate-200/60 rounded-xl shadow-xl overflow-hidden"
+          className="bg-white/95 backdrop-blur-xl border border-slate-200/60 rounded-xl shadow-xl overflow-hidden max-h-[500px] overflow-y-auto"
         >
           {showingTop && (
-            <p className="px-5 pt-4 pb-2 text-xs font-medium text-slate-500 tracking-wide">
-              Common medications
-            </p>
+            <>
+              <p className="px-5 pt-4 pb-2 text-xs font-medium text-slate-500 tracking-wide">
+                Common medications
+              </p>
+              {topMeds.map((med) => (
+                <button
+                  key={med.id}
+                  onMouseDown={() => handleSelectMedication(med)}
+                  className="w-full text-left px-5 py-3.5 hover:bg-slate-50/80 active:bg-slate-100/80 border-b border-slate-100/50 last:border-0 transition-all min-h-[56px]"
+                >
+                  {med.brand_names && med.brand_names.length > 0 ? (
+                    <>
+                      <p className="text-sm font-medium text-slate-900">
+                        {med.brand_names[0]}{" "}
+                        <span className="text-slate-500 font-normal">({med.generic_name})</span>
+                      </p>
+                      <p className="text-xs text-slate-500 mt-0.5 font-light">
+                        {med.dosage_form}
+                        {med.is_otc && " · OTC"}
+                        {med.requires_pa && " · PA required"}
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="text-sm font-medium text-slate-900">{med.name}</p>
+                      <p className="text-xs text-slate-500 mt-0.5 font-light">
+                        {med.generic_name} · {med.dosage_form}
+                        {med.is_otc && " · OTC"}
+                        {med.requires_pa && " · PA required"}
+                      </p>
+                    </>
+                  )}
+                </button>
+              ))}
+            </>
           )}
-          {visibleItems.map((med) => (
-            <button
-              key={med.id}
-              onMouseDown={() => handleSelect(med)}
-              className="w-full text-left px-5 py-3.5 hover:bg-slate-50/80 active:bg-slate-100/80 border-b border-slate-100/50 last:border-0 transition-all min-h-[56px]"
-            >
-              {med.brand_names && med.brand_names.length > 0 ? (
+
+          {showingSearch && (
+            <>
+              {/* Diagnoses section */}
+              {diagnosisResults.length > 0 && (
                 <>
-                  <p className="text-sm font-medium text-slate-900">
-                    {med.brand_names[0]}{" "}
-                    <span className="text-slate-500 font-normal">({med.generic_name})</span>
+                  <p className="px-5 pt-4 pb-2 text-xs font-medium text-slate-500 tracking-wide">
+                    CONDITIONS
                   </p>
-                  <p className="text-xs text-slate-500 mt-0.5 font-light">
-                    {med.dosage_form}
-                    {med.is_otc && " · OTC"}
-                    {med.requires_pa && " · PA required"}
-                  </p>
-                </>
-              ) : (
-                <>
-                  <p className="text-sm font-medium text-slate-900">{med.name}</p>
-                  <p className="text-xs text-slate-500 mt-0.5 font-light">
-                    {med.generic_name} · {med.dosage_form}
-                    {med.is_otc && " · OTC"}
-                    {med.requires_pa && " · PA required"}
-                  </p>
+                  {diagnosisResults.map((diagnosis) => (
+                    <button
+                      key={diagnosis.id}
+                      onMouseDown={() => handleSelectDiagnosis(diagnosis)}
+                      className="w-full text-left px-5 py-3.5 hover:bg-blue-50/80 active:bg-blue-100/80 border-b border-slate-100/50 transition-all min-h-[56px]"
+                    >
+                      <p className="text-sm font-medium text-slate-900">{diagnosis.name}</p>
+                      <p className="text-xs text-slate-500 mt-0.5 font-light">
+                        ICD-10: {diagnosis.icd10_codes.join(", ")}
+                      </p>
+                    </button>
+                  ))}
                 </>
               )}
-            </button>
-          ))}
+
+              {/* Medications section */}
+              {medicationResults.length > 0 && (
+                <>
+                  <p className="px-5 pt-4 pb-2 text-xs font-medium text-slate-500 tracking-wide">
+                    MEDICATIONS
+                  </p>
+                  {medicationResults.map((med) => (
+                    <button
+                      key={med.id}
+                      onMouseDown={() => handleSelectMedication(med)}
+                      className="w-full text-left px-5 py-3.5 hover:bg-slate-50/80 active:bg-slate-100/80 border-b border-slate-100/50 last:border-0 transition-all min-h-[56px]"
+                    >
+                      {med.brand_names && med.brand_names.length > 0 ? (
+                        <>
+                          <p className="text-sm font-medium text-slate-900">
+                            {med.brand_names[0]}{" "}
+                            <span className="text-slate-500 font-normal">({med.generic_name})</span>
+                          </p>
+                          <p className="text-xs text-slate-500 mt-0.5 font-light">
+                            {med.dosage_form}
+                            {med.is_otc && " · OTC"}
+                            {med.requires_pa && " · PA required"}
+                          </p>
+                        </>
+                      ) : (
+                        <>
+                          <p className="text-sm font-medium text-slate-900">{med.name}</p>
+                          <p className="text-xs text-slate-500 mt-0.5 font-light">
+                            {med.generic_name} · {med.dosage_form}
+                            {med.is_otc && " · OTC"}
+                            {med.requires_pa && " · PA required"}
+                          </p>
+                        </>
+                      )}
+                    </button>
+                  ))}
+                </>
+              )}
+            </>
+          )}
         </div>,
         document.body
       )}

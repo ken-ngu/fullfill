@@ -4,7 +4,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from src.config import settings
 from src.auth.router import router as auth_router
 from src.api.v1.medications import router as medications_router
+from src.api.v1.diagnoses import router as diagnoses_router
 from src.api.v1.events import router as events_router
+from src.api.v1.replenishment import router as replenishment_router
 
 
 def _configure_logging() -> None:
@@ -27,13 +29,15 @@ def create_app() -> FastAPI:
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origins,
-        allow_methods=["GET", "POST"],
+        allow_methods=["GET", "POST", "PATCH", "DELETE"],
         allow_headers=["*"],
     )
 
     app.include_router(auth_router, prefix="/api/v1")
     app.include_router(medications_router, prefix="/api/v1")
+    app.include_router(diagnoses_router, prefix="/api/v1")
     app.include_router(events_router, prefix="/api/v1")
+    app.include_router(replenishment_router, prefix="/api/v1")
 
     @app.get("/health")
     def health() -> dict:

@@ -1,18 +1,19 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
-import type { MedicationSummary, MedicationDetail, PatientContext } from "../types";
-import { getMedication, logEvent } from "../api/client";
+import type { MedicationSummary, MedicationDetail, PatientContext, DiagnosisSummary, DiagnosisDetail } from "../types";
+import { getMedication, getDiagnosis, logEvent } from "../api/client";
 import { SearchBar } from "../components/SearchBar";
 import { FillRiskBanner } from "../components/FillRiskBanner";
 import { CostCard } from "../components/CostCard";
 import { PAStatusCard } from "../components/PAStatusCard";
+import { DiagnosisLinks } from "../components/DiagnosisLinks";
 import { AlternativesDrawer } from "../components/AlternativesDrawer";
 import { AlternativesTable } from "../components/AlternativesTable";
 import { NoAlternatives } from "../components/NoAlternatives";
 import { LoadingSkeleton } from "../components/LoadingSkeleton";
 import { PatientContextBar } from "../components/PatientContextBar";
-import { SpecialtySelector } from "../components/SpecialtySelector";
 import { Navbar } from "../components/Navbar";
+import { DiagnosisDetailView } from "../components/DiagnosisDetailView";
 
 const SESSION_ID = uuidv4();
 
@@ -27,11 +28,12 @@ interface SearchProps {
   specialty: string;
   setting: string;
   onSpecialtyChange: (specialty: string, setting: string) => void;
-  onNavigate: (page: string) => void;
+  onNavigate: (page: string, data?: any) => void;
 }
 
 export function Search({ specialty, setting, onSpecialtyChange, onNavigate }: SearchProps) {
   const [detail, setDetail] = useState<MedicationDetail | null>(null);
+  const [diagnosisDetail, setDiagnosisDetail] = useState<DiagnosisDetail | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [ctx, setCtx] = useState<PatientContext>({
@@ -52,6 +54,7 @@ export function Search({ specialty, setting, onSpecialtyChange, onNavigate }: Se
   const loadMedication = useCallback(async (id: string, currentCtx: PatientContext) => {
     setLoading(true);
     setError(null);
+    setDiagnosisDetail(null); // Clear diagnosis when loading medication
     try {
       const data = await getMedication(id, currentCtx);
       setDetail(data);
@@ -70,6 +73,27 @@ export function Search({ specialty, setting, onSpecialtyChange, onNavigate }: Se
     }
   }, []);
 
+  const loadDiagnosis = useCallback(async (id: string, currentCtx: PatientContext) => {
+    setLoading(true);
+    setError(null);
+    setDetail(null); // Clear medication when loading diagnosis
+    try {
+      const data = await getDiagnosis(id, currentCtx);
+      setDiagnosisDetail(data);
+      logEvent({
+        session_id: SESSION_ID,
+        event_type: "diagnosis_selected",
+        insurance_type: currentCtx.insurance_type,
+        patient_age_group: ageGroup(currentCtx.age),
+      }).catch(() => {});
+    } catch (e) {
+      setError((e as Error).message);
+      setDiagnosisDetail(null);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   function handleSearchSelect(med: MedicationSummary) {
     logEvent({
       session_id: SESSION_ID,
@@ -78,6 +102,23 @@ export function Search({ specialty, setting, onSpecialtyChange, onNavigate }: Se
       insurance_type: ctx.insurance_type,
     }).catch(() => {});
     loadMedication(med.id, ctx);
+  }
+
+  function handleDiagnosisSelect(diagnosis: DiagnosisSummary) {
+    logEvent({
+      session_id: SESSION_ID,
+      event_type: "diagnosis_searched",
+      insurance_type: ctx.insurance_type,
+    }).catch(() => {});
+    loadDiagnosis(diagnosis.id, ctx);
+  }
+
+  function handleDiagnosisNavigate(diagnosisId: string) {
+    loadDiagnosis(diagnosisId, ctx);
+  }
+
+  function handleDiagnosisMedicationSelect(medicationId: string) {
+    loadMedication(medicationId, ctx);
   }
 
   function handleSwitch(alternativeId: string) {
@@ -93,9 +134,11 @@ export function Search({ specialty, setting, onSpecialtyChange, onNavigate }: Se
 
   function handleCtxChange(newCtx: PatientContext) {
     setCtx(newCtx);
-    // Re-fetch if a medication is already selected
+    // Re-fetch if a medication or diagnosis is already selected
     if (detail) {
       loadMedication(detail.id, newCtx);
+    } else if (diagnosisDetail) {
+      loadDiagnosis(diagnosisDetail.id, newCtx);
     }
   }
 
@@ -105,18 +148,6 @@ export function Search({ specialty, setting, onSpecialtyChange, onNavigate }: Se
       <div className="max-w-7xl mx-auto px-4 pt-24 pb-24">
         {/* Search and controls - Apple-inspired minimal layout */}
         <div className="max-w-2xl mx-auto">
-          {/* Specialty selector with label on left */}
-          <div className="mb-6">
-            <label className="block text-xs font-medium text-slate-500 mb-2">
-              Specialty
-            </label>
-            <SpecialtySelector
-              onSelect={onSpecialtyChange}
-              currentSpecialty={specialty}
-              currentSetting={setting}
-            />
-          </div>
-
           {/* Patient context */}
           <div className="mb-6">
             <PatientContextBar ctx={ctx} onChange={handleCtxChange} />
@@ -124,7 +155,12 @@ export function Search({ specialty, setting, onSpecialtyChange, onNavigate }: Se
 
           {/* Search bar - below patient context */}
           <div className="mb-8">
-            <SearchBar onSelect={handleSearchSelect} specialty={specialty} setting={setting} />
+            <SearchBar
+              onSelect={handleSearchSelect}
+              onSelectDiagnosis={handleDiagnosisSelect}
+              specialty={undefined}
+              setting={setting}
+            />
           </div>
         </div>
 
@@ -141,6 +177,13 @@ export function Search({ specialty, setting, onSpecialtyChange, onNavigate }: Se
               <p className="text-sm text-red-700">{error}</p>
             </div>
           </div>
+        )}
+
+        {!loading && diagnosisDetail && (
+          <DiagnosisDetailView
+            diagnosis={diagnosisDetail}
+            onSelectMedication={handleDiagnosisMedicationSelect}
+          />
         )}
 
         {!loading && detail && (
@@ -187,6 +230,12 @@ export function Search({ specialty, setting, onSpecialtyChange, onNavigate }: Se
                     <CostCard estimate={detail.cost_estimate} confidenceScore={detail.confidence_score} />
                     <PAStatusCard pa={detail.pa_status} />
                   </div>
+
+                  {/* 3. Diagnosis links */}
+                  <DiagnosisLinks
+                    diagnoses={detail.diagnoses}
+                    onNavigate={handleDiagnosisNavigate}
+                  />
 
                   {/* Mobile-only: Alternatives drawer for small screens */}
                   <div className="lg:hidden">

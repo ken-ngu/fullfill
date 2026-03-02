@@ -25,7 +25,11 @@ class AbstractMedicationRepository(ABC):
 
 
 def _to_dict(med: Medication) -> dict:
-    return {c.name: getattr(med, c.name) for c in med.__table__.columns}
+    result = {c.name: getattr(med, c.name) for c in med.__table__.columns}
+    # Include diagnoses relationship if loaded
+    if hasattr(med, 'diagnoses') and med.diagnoses is not None:
+        result['diagnoses'] = [diag.id for diag in med.diagnoses]
+    return result
 
 
 class PostgresMedicationRepository(AbstractMedicationRepository):
@@ -47,7 +51,10 @@ class PostgresMedicationRepository(AbstractMedicationRepository):
         return [_to_dict(m) for m in query.limit(limit).all()]
 
     def get_by_id(self, medication_id: str) -> dict | None:
-        med = self._session.query(Medication).filter(Medication.id == medication_id).first()
+        from sqlalchemy.orm import joinedload
+        med = self._session.query(Medication).options(
+            joinedload(Medication.diagnoses)
+        ).filter(Medication.id == medication_id).first()
         return _to_dict(med) if med else None
 
     def get_all(self, specialty: str | None = None) -> list[dict]:

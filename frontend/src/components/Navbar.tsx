@@ -78,6 +78,12 @@ export function Navbar({ variant = "landing", onNavigate }: NavbarProps) {
                   Data Sources
                 </button>
                 <button
+                  onClick={() => handleNavClick("admin340b")}
+                  className="text-sm text-slate-600 hover:text-slate-900 transition-colors"
+                >
+                  340B Admin
+                </button>
+                <button
                   onClick={() => handleNavClick("profile")}
                   className="text-sm text-slate-600 hover:text-slate-900 transition-colors"
                 >
@@ -164,6 +170,12 @@ export function Navbar({ variant = "landing", onNavigate }: NavbarProps) {
                   className="block w-full text-left text-sm text-slate-600 hover:text-slate-900 transition-colors py-2"
                 >
                   Data Sources
+                </button>
+                <button
+                  onClick={() => handleNavClick("admin340b")}
+                  className="block w-full text-left text-sm text-slate-600 hover:text-slate-900 transition-colors py-2"
+                >
+                  340B Admin
                 </button>
                 <button
                   onClick={() => handleNavClick("profile")}
