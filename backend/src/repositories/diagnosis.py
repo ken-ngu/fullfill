@@ -12,6 +12,17 @@ from src.cache import (
 
 logger = logging.getLogger(__name__)
 
+# Cache column names to avoid repeated reflection (performance optimization)
+_DIAGNOSIS_COLUMNS = None
+
+
+def _get_diagnosis_columns():
+    """Get cached list of diagnosis column names."""
+    global _DIAGNOSIS_COLUMNS
+    if _DIAGNOSIS_COLUMNS is None:
+        _DIAGNOSIS_COLUMNS = [c.name for c in Diagnosis.__table__.columns]
+    return _DIAGNOSIS_COLUMNS
+
 
 class AbstractDiagnosisRepository(ABC):
     @abstractmethod
@@ -32,7 +43,9 @@ class AbstractDiagnosisRepository(ABC):
 
 def _to_dict(diagnosis: Diagnosis, include_medications: bool = False) -> dict:
     """Convert Diagnosis model to dictionary"""
-    result = {c.name: getattr(diagnosis, c.name) for c in diagnosis.__table__.columns}
+    # Use cached column names instead of reflecting every time (performance optimization)
+    columns = _get_diagnosis_columns()
+    result = {col: getattr(diagnosis, col) for col in columns}
     if include_medications and hasattr(diagnosis, 'medications'):
         # Import _to_dict from medication repo to avoid circular imports
         from src.repositories.medication import _to_dict as med_to_dict

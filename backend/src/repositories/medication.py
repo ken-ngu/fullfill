@@ -12,6 +12,17 @@ from src.cache import (
 
 logger = logging.getLogger(__name__)
 
+# Cache column names to avoid repeated reflection (performance optimization)
+_MEDICATION_COLUMNS = None
+
+
+def _get_medication_columns():
+    """Get cached list of medication column names."""
+    global _MEDICATION_COLUMNS
+    if _MEDICATION_COLUMNS is None:
+        _MEDICATION_COLUMNS = [c.name for c in Medication.__table__.columns]
+    return _MEDICATION_COLUMNS
+
 
 class AbstractMedicationRepository(ABC):
     @abstractmethod
@@ -32,7 +43,9 @@ class AbstractMedicationRepository(ABC):
 
 
 def _to_dict(med: Medication) -> dict:
-    result = {c.name: getattr(med, c.name) for c in med.__table__.columns}
+    # Use cached column names instead of reflecting every time (performance optimization)
+    columns = _get_medication_columns()
+    result = {col: getattr(med, col) for col in columns}
     # Include diagnoses relationship if loaded
     if hasattr(med, 'diagnoses') and med.diagnoses is not None:
         result['diagnoses'] = [diag.id for diag in med.diagnoses]
@@ -98,10 +111,24 @@ class PostgresMedicationRepository(AbstractMedicationRepository):
         return result
 
     def get_all(self, specialty: Optional[str] = None) -> list[dict]:
+        # Check cache first
+        cache_key = build_cache_key("med", "get_all", specialty or "all")
+        cached = cache_get(cache_key)
+        if cached is not None:
+            logger.debug(f"Cache HIT: get_all specialty='{specialty}'")
+            return cached
+
+        logger.debug(f"Cache MISS: get_all specialty='{specialty}'")
         query = self._session.query(Medication)
         if specialty:
             query = query.filter(Medication.specialty == specialty)
-        return [_to_dict(m) for m in query.all()]
+
+        results = [_to_dict(m) for m in query.all()]
+
+        # Cache the results
+        cache_set(cache_key, results, ttl=CACHE_TTL_MEDICATION)
+
+        return results
 
     def get_top(self, specialty: Optional[str] = None, setting: Optional[str] = None, limit: int = 6) -> list[dict]:
         # Check cache first

@@ -14,6 +14,17 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+# Cache column names to avoid repeated reflection (performance optimization)
+_REPLENISHMENT_COLUMNS = None
+
+
+def _get_replenishment_columns():
+    """Get cached list of replenishment order column names."""
+    global _REPLENISHMENT_COLUMNS
+    if _REPLENISHMENT_COLUMNS is None:
+        _REPLENISHMENT_COLUMNS = [c.name for c in ReplenishmentOrder.__table__.columns]
+    return _REPLENISHMENT_COLUMNS
+
 
 class AbstractReplenishmentRepository(ABC):
     """Abstract base class for replenishment order repository."""
@@ -82,7 +93,9 @@ class AbstractReplenishmentRepository(ABC):
 
 def _to_dict(order: ReplenishmentOrder) -> dict:
     """Convert ReplenishmentOrder model to dictionary."""
-    return {c.name: getattr(order, c.name) for c in order.__table__.columns}
+    # Use cached column names instead of reflecting every time (performance optimization)
+    columns = _get_replenishment_columns()
+    return {col: getattr(order, col) for col in columns}
 
 
 class PostgresReplenishmentRepository(AbstractReplenishmentRepository):
