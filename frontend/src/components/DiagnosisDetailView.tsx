@@ -19,8 +19,19 @@ function FormularyTierBadge({ tier }: { tier: number }) {
     3: "bg-yellow-100 text-yellow-800",
     4: "bg-orange-100 text-orange-800",
   };
+
+  const tooltips = {
+    1: "Tier 1: Lowest cost - Generic medications",
+    2: "Tier 2: Low cost - Preferred brands",
+    3: "Tier 3: Higher cost - Non-preferred brands",
+    4: "Tier 4: Highest cost - Specialty medications",
+  };
+
   return (
-    <span className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium whitespace-nowrap ${colors[tier as keyof typeof colors] || "bg-gray-100 text-gray-800"}`}>
+    <span
+      className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium whitespace-nowrap cursor-help ${colors[tier as keyof typeof colors] || "bg-gray-100 text-gray-800"}`}
+      title={tooltips[tier as keyof typeof tooltips] || `Tier ${tier}`}
+    >
       T{tier}
     </span>
   );
