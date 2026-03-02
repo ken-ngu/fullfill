@@ -8,6 +8,7 @@ from src.api.v1.diagnoses import router as diagnoses_router
 from src.api.v1.events import router as events_router
 from src.api.v1.replenishment import router as replenishment_router
 from src.api.v1.admin import router as admin_router
+from src.api.v1.cache import router as cache_router
 
 
 def _configure_logging() -> None:
@@ -40,6 +41,7 @@ def create_app() -> FastAPI:
     app.include_router(events_router, prefix="/api/v1")
     app.include_router(replenishment_router, prefix="/api/v1")
     app.include_router(admin_router, prefix="/api/v1")
+    app.include_router(cache_router, prefix="/api/v1")
 
     @app.get("/health")
     def health() -> dict:

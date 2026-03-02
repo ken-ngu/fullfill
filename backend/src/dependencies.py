@@ -10,7 +10,19 @@ from src.repositories.goodrx_price import PostgresGoodRxPriceRepository, Abstrac
 from src.repositories.replenishment import PostgresReplenishmentRepository, AbstractReplenishmentRepository
 from src.auth.service import verify_token_payload
 
-_engine = create_engine(settings.database_url)
+# Configure connection pool for optimal performance and reliability
+_engine = create_engine(
+    settings.database_url,
+    pool_size=10,              # Maximum 10 concurrent connections in the pool
+    max_overflow=20,           # Allow up to 20 additional connections during peak load
+    pool_recycle=3600,         # Recycle connections after 1 hour to prevent stale connections
+    pool_pre_ping=True,        # Test connection health before using (prevents stale connection errors)
+    echo=False,                # Disable SQL query logging (set to True for debugging)
+    connect_args={
+        "connect_timeout": 10,              # 10 second connection timeout
+        "options": "-c statement_timeout=30000"  # 30 second query timeout
+    }
+)
 _SessionLocal = sessionmaker(bind=_engine)
 
 

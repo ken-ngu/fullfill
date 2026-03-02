@@ -1,9 +1,8 @@
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
-from src.dependencies import get_diagnosis_repo, get_medication_repo
+from src.dependencies import get_diagnosis_repo
 from src.repositories.diagnosis import AbstractDiagnosisRepository
-from src.repositories.medication import AbstractMedicationRepository
 from src.schemas.diagnosis import DiagnosisSummary, DiagnosisDetail, DiagnosisMedicationSummary
 from src.schemas.medication import PatientContext, CostEstimate
 from src.services.pricing import calculate_patient_cost, get_price_type_label, get_copay_card_note
@@ -79,7 +78,6 @@ def get_diagnosis(
     plan_type: Optional[str] = Query(None),
     state: Optional[str] = Query(None),
     diagnosis_repo: AbstractDiagnosisRepository = Depends(get_diagnosis_repo),
-    medication_repo: AbstractMedicationRepository = Depends(get_medication_repo),
 ) -> DiagnosisDetail:
     """
     Get diagnosis details with all medications that treat it.
@@ -100,25 +98,24 @@ def get_diagnosis(
         state=state,
     )
 
-    # Fetch full medication details for each medication
+    # Use already-loaded medication data (no additional queries needed!)
+    # The repository returns full medication dictionaries via joinedload
     medications = []
-    for med_id in diagnosis_data.get("medications", []):
-        med = medication_repo.get_by_id(med_id)
-        if med:
-            cost_est = _cost_estimate(med, patient_ctx)
-            medications.append(
-                DiagnosisMedicationSummary(
-                    id=med["id"],
-                    name=med["name"],
-                    generic_name=med["generic_name"],
-                    brand_names=med.get("brand_names") or [],
-                    dosage_form=med["dosage_form"],
-                    strength=med["strength"],
-                    formulary_tier=med["formulary_tier"],
-                    requires_pa=med["requires_pa"],
-                    cost_estimate=cost_est,
-                )
+    for med in diagnosis_data.get("medications", []):
+        cost_est = _cost_estimate(med, patient_ctx)
+        medications.append(
+            DiagnosisMedicationSummary(
+                id=med["id"],
+                name=med["name"],
+                generic_name=med["generic_name"],
+                brand_names=med.get("brand_names") or [],
+                dosage_form=med["dosage_form"],
+                strength=med["strength"],
+                formulary_tier=med["formulary_tier"],
+                requires_pa=med["requires_pa"],
+                cost_estimate=cost_est,
             )
+        )
 
     # Sort medications by cost (cheapest first)
     medications.sort(key=lambda m: m.cost_estimate.low_usd)

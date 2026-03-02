@@ -1,9 +1,16 @@
 from typing import Optional
+import logging
 
 from abc import ABC, abstractmethod
 from sqlalchemy import func, String, or_, text
 from sqlalchemy.orm import Session, joinedload
 from src.models.diagnosis import Diagnosis
+from src.cache import (
+    cache_get, cache_set, build_cache_key,
+    CACHE_TTL_SEARCH, CACHE_TTL_DIAGNOSIS
+)
+
+logger = logging.getLogger(__name__)
 
 
 class AbstractDiagnosisRepository(ABC):
@@ -27,7 +34,10 @@ def _to_dict(diagnosis: Diagnosis, include_medications: bool = False) -> dict:
     """Convert Diagnosis model to dictionary"""
     result = {c.name: getattr(diagnosis, c.name) for c in diagnosis.__table__.columns}
     if include_medications and hasattr(diagnosis, 'medications'):
-        result['medications'] = [med.id for med in diagnosis.medications]
+        # Import _to_dict from medication repo to avoid circular imports
+        from src.repositories.medication import _to_dict as med_to_dict
+        # Return full medication dictionaries, not just IDs
+        result['medications'] = [med_to_dict(med) for med in diagnosis.medications]
     return result
 
 
@@ -44,6 +54,14 @@ class PostgresDiagnosisRepository(AbstractDiagnosisRepository):
         - "N39" matches "Urinary Tract Infection" (via ICD-10 code)
         - "acne" matches "Acne Vulgaris" (via name)
         """
+        # Check cache first
+        cache_key = build_cache_key("diag", "search", q, str(limit))
+        cached = cache_get(cache_key)
+        if cached is not None:
+            logger.debug(f"Cache HIT: diagnosis search '{q}'")
+            return cached
+
+        logger.debug(f"Cache MISS: diagnosis search '{q}'")
         q_lower = f"%{q.lower()}%"
 
         # Build efficient JSONB array search using jsonb_array_elements_text
@@ -57,7 +75,12 @@ class PostgresDiagnosisRepository(AbstractDiagnosisRepository):
         )
 
         results = query.limit(limit).all()
-        return [_to_dict(d) for d in results]
+        result_list = [_to_dict(d) for d in results]
+
+        # Cache the results
+        cache_set(cache_key, result_list, ttl=CACHE_TTL_SEARCH)
+
+        return result_list
 
     def get_by_id(self, diagnosis_id: str) -> Optional[dict]:
         """Get single diagnosis by ID without medications"""
@@ -72,6 +95,14 @@ class PostgresDiagnosisRepository(AbstractDiagnosisRepository):
         Get diagnosis with all associated medications eagerly loaded.
         This is used for the diagnosis detail page to show all treatment options.
         """
+        # Check cache first
+        cache_key = build_cache_key("diag", "detail", diagnosis_id)
+        cached = cache_get(cache_key)
+        if cached is not None:
+            logger.debug(f"Cache HIT: diagnosis detail '{diagnosis_id}'")
+            return cached
+
+        logger.debug(f"Cache MISS: diagnosis detail '{diagnosis_id}'")
         diagnosis = self._session.query(Diagnosis).options(
             joinedload(Diagnosis.medications)
         ).filter(
@@ -81,4 +112,9 @@ class PostgresDiagnosisRepository(AbstractDiagnosisRepository):
         if not diagnosis:
             return None
 
-        return _to_dict(diagnosis, include_medications=True)
+        result = _to_dict(diagnosis, include_medications=True)
+
+        # Cache the result
+        cache_set(cache_key, result, ttl=CACHE_TTL_DIAGNOSIS)
+
+        return result
