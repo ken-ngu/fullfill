@@ -109,6 +109,16 @@ export function Landing({ onContinue, onNavigate }: Props) {
           Estimates are not a guarantee of actual patient cost.
           Not a substitute for clinical judgment.
         </p>
+
+        {/* Patent Notice */}
+        <div className="mt-6 pt-6 border-t border-slate-200/60">
+          <p className="text-xs text-slate-400">
+            FullFill<sup className="text-[8px]">®</sup> — Patent Pending
+          </p>
+          <p className="text-[10px] text-slate-300 mt-1">
+            Specialty-Aware Prescription Cost Transparency Technology
+          </p>
+        </div>
       </div>
       </div>
     </div>

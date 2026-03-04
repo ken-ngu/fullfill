@@ -61,7 +61,16 @@ export function About({ onNavigate }: Props) {
 
           {/* Our Solution */}
           <div className="bg-white rounded-2xl shadow-card border border-slate-200 p-8 mb-8">
-            <h2 className="text-2xl font-semibold text-slate-900 mb-4">Our Solution</h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-2xl font-semibold text-slate-900">Our Solution</h2>
+              <span className="inline-flex items-center gap-1.5 bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-xs font-semibold px-3 py-1.5 rounded-full shadow-sm">
+                <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
+                  <path fillRule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clipRule="evenodd"/>
+                </svg>
+                Patent Pending
+              </span>
+            </div>
             <p className="text-slate-700 leading-relaxed mb-6">
               FullFill integrates transparent pricing data, formulary information, and
               clinical alternatives into a simple search interface. We help you:
@@ -89,6 +98,45 @@ export function About({ onNavigate }: Props) {
                 </p>
               </div>
             </div>
+          </div>
+
+          {/* Innovation & IP */}
+          <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl border border-indigo-200 p-8 mb-8">
+            <div className="flex items-start gap-3 mb-4">
+              <div className="bg-white rounded-lg p-2 shadow-sm">
+                <svg className="w-6 h-6 text-indigo-600" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
+                  <path fillRule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clipRule="evenodd"/>
+                </svg>
+              </div>
+              <div>
+                <h2 className="text-2xl font-semibold text-slate-900 mb-2">Our Innovation</h2>
+                <p className="text-sm text-indigo-700 font-medium">U.S. Patent Pending — Filed March 2026</p>
+              </div>
+            </div>
+            <p className="text-slate-700 leading-relaxed mb-4">
+              FullFill's specialty-aware prescription fill risk prediction system is protected by
+              <strong> U.S. Patent Pending</strong> status. Our technology represents a breakthrough
+              in prescription cost transparency, combining:
+            </p>
+            <ul className="space-y-2 text-slate-700">
+              <li className="flex items-start gap-2">
+                <span className="text-indigo-600 font-bold mt-0.5">✓</span>
+                <span>Specialty-aware fill risk scoring algorithm</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-indigo-600 font-bold mt-0.5">✓</span>
+                <span>Multi-factor confidence scoring system</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-indigo-600 font-bold mt-0.5">✓</span>
+                <span>Government data aggregation and analysis</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-indigo-600 font-bold mt-0.5">✓</span>
+                <span>Point-of-prescribing clinical decision support</span>
+              </li>
+            </ul>
           </div>
 
           {/* Meet the Founder */}
